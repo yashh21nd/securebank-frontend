@@ -1,0 +1,12 @@
+# Render Blueprint for Fraud Detection API
+services:
+  - type: web
+    name: securebank-fraud-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn fraud_api_server:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: FLASK_ENV
+        value: production
