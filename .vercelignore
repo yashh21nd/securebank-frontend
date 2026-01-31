@@ -1,0 +1,8 @@
+# Ignore ML model folder - deployed separately
+ml_model/
+*.csv
+*.joblib
+__pycache__/
+.venv/
+venv/
+instance/
