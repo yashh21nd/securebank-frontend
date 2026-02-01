@@ -135,7 +135,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
     // Filter demo contacts for demo mode
     if (!getAuthToken() || getAuthToken()?.startsWith('demo-')) {
-      const filtered = demoContacts.filter(c => 
+      const filtered = contacts.filter(c => 
         c.full_name.toLowerCase().includes(query.toLowerCase()) ||
         c.username.toLowerCase().includes(query.toLowerCase()) ||
         c.upi_id.toLowerCase().includes(query.toLowerCase())
@@ -150,7 +150,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
     } catch (err) {
       console.error('Search failed:', err)
       // Fall back to demo contacts filtering
-      const filtered = demoContacts.filter(c => 
+      const filtered = contacts.filter(c => 
         c.full_name.toLowerCase().includes(query.toLowerCase())
       )
       setSearchResults(filtered)
@@ -602,62 +602,93 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
   }
 
   return (
-    <div className="payment-container">
-      <div className="payment-card">
-        {/* Header */}
-        <div className="payment-header">
-          <h2>Payments</h2>
-          {balance !== null && (
-            <div className="balance-display">
-              <span className="balance-label">Available Balance</span>
-              <span className="balance-amount">₹{balance.toFixed(2)}</span>
-            </div>
-          )}
+    <div className="payment-page">
+      {/* Page Header with Description */}
+      <div className="page-intro">
+        <div className="intro-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
         </div>
-
-        {/* Tabs */}
-        <div className="payment-tabs">
-          <button 
-            className={`tab ${activeTab === 'send' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('send'); setError(''); setSuccess(''); }}
-          >
-            Send Money
-          </button>
-          <button 
-            className={`tab ${activeTab === 'scan' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('scan'); setError(''); setSuccess(''); }}
-          >
-            Scan QR
-          </button>
-          <button 
-            className={`tab ${activeTab === 'request' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('request'); setError(''); setSuccess(''); }}
-          >
-            Request
-          </button>
-          <button 
-            className={`tab ${activeTab === 'qr' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('qr'); setError(''); setSuccess(''); }}
-          >
-            My QR
-          </button>
+        <h1>Payments</h1>
+        <p className="intro-description">
+          Send money instantly to anyone, scan QR codes for quick payments, or generate your own QR code 
+          to receive funds. Every transaction is protected by our AI-powered fraud detection system 
+          trained on millions of real transactions.
+        </p>
+        <div className="intro-features">
+          <div className="intro-feature">
+            <span className="feature-icon">🔒</span>
+            <span>Bank-grade Security</span>
+          </div>
+          <div className="intro-feature">
+            <span className="feature-icon">📱</span>
+            <span>QR Payments</span>
+          </div>
+          <div className="intro-feature">
+            <span className="feature-icon">🛡️</span>
+            <span>Fraud Protected</span>
+          </div>
         </div>
+      </div>
 
-        <div className="payment-content">
-          {/* Error/Success Messages */}
-          {error && <div className="alert alert-error">{error}</div>}
-          {success && <div className="alert alert-success">{success}</div>}
+      <div className="payment-container">
+        <div className="payment-card">
+          {/* Header */}
+          <div className="payment-header">
+            <h2>Payments</h2>
+            {balance !== null && (
+              <div className="balance-display">
+                <span className="balance-label">Available Balance</span>
+                <span className="balance-amount">₹{balance.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
 
-          {/* Fraud Detection Service Status */}
-          {fraudServiceActive && (
-            <div className="fraud-service-badge">
-              <span className="badge-icon">🛡️</span>
-              <span>ML Fraud Protection Active</span>
-            </div>
-          )}
+          {/* Tabs */}
+          <div className="payment-tabs">
+            <button 
+              className={`tab ${activeTab === 'send' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('send'); setError(''); setSuccess(''); }}
+            >
+              Send Money
+            </button>
+            <button 
+              className={`tab ${activeTab === 'scan' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('scan'); setError(''); setSuccess(''); }}
+            >
+              Scan QR
+            </button>
+            <button 
+              className={`tab ${activeTab === 'request' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('request'); setError(''); setSuccess(''); }}
+            >
+              Request
+            </button>
+            <button 
+              className={`tab ${activeTab === 'qr' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('qr'); setError(''); setSuccess(''); }}
+            >
+              My QR
+            </button>
+          </div>
 
-          {/* Fraud Warning Modal */}
-          {showFraudWarning && fraudAnalysis && (
+          <div className="payment-content">
+            {/* Error/Success Messages */}
+            {error && <div className="alert alert-error">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
+
+            {/* Fraud Detection Service Status */}
+            {fraudServiceActive && (
+              <div className="fraud-service-badge">
+                <span className="badge-icon">🛡️</span>
+                <span>ML Fraud Protection Active</span>
+              </div>
+            )}
+
+            {/* Fraud Warning Modal */}
+            {showFraudWarning && fraudAnalysis && (
             <div className="fraud-warning-overlay">
               <div className="fraud-warning-modal">
                 <div className={`fraud-header ${fraudAnalysis.riskLevel}`}>
@@ -762,7 +793,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                       <div className="contacts-header">
                         <label>Recent Contacts</label>
                         {fraudServiceActive && datasetStats && (
-                          <div className="dataset-badge" title={`Trained on ${datasetStats.total_records?.toLocaleString()} transactions with ${datasetStats.fraud_rate?.toFixed(2)}% fraud rate`}>
+                          <div className="dataset-badge" title={`Trained on ${(datasetStats.total_records || 0).toLocaleString()} transactions with ${(datasetStats.fraud_rate || 0).toFixed(2)}% fraud rate`}>
                             <span className="badge-dot"></span>
                             <span>ML Active</span>
                             <span className="badge-detail">PaySim Dataset</span>
@@ -863,11 +894,11 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                         </div>
                         <div className="stat-item">
                           <span className="stat-label">Avg. Amount</span>
-                          <span className="stat-value">₹{selectedContactFraudInfo.avgTransactionAmount.toLocaleString()}</span>
+                          <span className="stat-value">₹{(selectedContactFraudInfo.avgTransactionAmount || 0).toLocaleString()}</span>
                         </div>
                       </div>
 
-                      {selectedContactFraudInfo.riskFactors.length > 0 && (
+                      {selectedContactFraudInfo.riskFactors && selectedContactFraudInfo.riskFactors.length > 0 && (
                         <div className="risk-factors-section">
                           <h5>⚠️ Risk Factors Identified</h5>
                           <ul>
@@ -1313,6 +1344,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -1347,15 +1379,16 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .payment-card {
-          background: white;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
           border-radius: 24px;
           overflow: hidden;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-          border: 1px solid #e5e7eb;
+          box-shadow: 0 10px 40px rgba(22, 163, 74, 0.1);
+          border: 1px solid rgba(34, 197, 94, 0.2);
         }
 
         .payment-header {
-          background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+          background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
           padding: 28px;
           color: white;
           text-align: center;
@@ -1364,7 +1397,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .payment-header h2 {
           margin: 0;
           font-size: 24px;
-          font-family: 'Poppins', sans-serif;
+          font-family: 'Playfair Display', serif;
           font-weight: 600;
         }
 
@@ -1386,7 +1419,8 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .payment-tabs {
           display: flex;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+          background: rgba(255, 255, 255, 0.5);
         }
 
         .payment-tabs .tab {
@@ -1396,20 +1430,20 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           background: none;
           font-size: 14px;
           font-weight: 500;
-          color: #6b7280;
+          color: #16a34a;
           cursor: pointer;
           transition: all 0.3s;
           font-family: 'Inter', sans-serif;
         }
 
         .payment-tabs .tab.active {
-          color: #059669;
-          border-bottom: 3px solid #059669;
-          background: linear-gradient(to bottom, #f0fdf4, transparent);
+          color: #15803d;
+          border-bottom: 3px solid #22c55e;
+          background: linear-gradient(to bottom, rgba(34, 197, 94, 0.1), transparent);
         }
 
         .payment-tabs .tab:hover:not(.active) {
-          background: #f9fafb;
+          background: rgba(34, 197, 94, 0.08);
         }
 
         .payment-content {
@@ -1426,18 +1460,19 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           display: block;
           font-size: 13px;
           font-weight: 600;
-          color: #374151;
+          color: var(--sage-700, #4d7c0f);
           margin-bottom: 8px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
 
         .search-results {
-          border: 1px solid #e5e7eb;
+          border: 1px solid rgba(0, 0, 0, 0.08);
           border-radius: 12px;
           max-height: 200px;
           overflow-y: auto;
           margin-top: 8px;
+          background: rgba(255, 255, 255, 0.8);
         }
 
         .search-result-item {
@@ -1446,7 +1481,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           padding: 12px 16px;
           cursor: pointer;
           transition: background 0.2s;
-          border-bottom: 1px solid #f3f4f6;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .search-result-item:last-child {
@@ -1454,14 +1489,14 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .search-result-item:hover {
-          background: #f0fdf4;
+          background: rgba(132, 204, 22, 0.1);
         }
 
         .user-avatar {
           width: 44px;
           height: 44px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          background: linear-gradient(135deg, var(--sage-500, #84cc16) 0%, var(--sage-600, #65a30d) 100%);
           color: white;
           display: flex;
           align-items: center;
@@ -1480,12 +1515,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .user-name {
           font-weight: 600;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
         }
 
         .user-upi {
           font-size: 13px;
-          color: #6b7280;
+          color: #16a34a;
         }
 
         .selected-recipient {
@@ -1493,9 +1528,9 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           justify-content: space-between;
           align-items: center;
           padding: 16px;
-          background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(22, 163, 74, 0.12) 100%);
           border-radius: 16px;
-          border: 1px solid #d1fae5;
+          border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .recipient-info {
@@ -1506,9 +1541,9 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .btn-change {
           padding: 8px 16px;
-          border: 2px solid #10b981;
+          border: 2px solid #22c55e;
           background: white;
-          color: #059669;
+          color: #16a34a;
           border-radius: 8px;
           cursor: pointer;
           font-weight: 600;
@@ -1517,7 +1552,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .btn-change:hover {
-          background: #f0fdf4;
+          background: rgba(34, 197, 94, 0.1);
         }
 
         .recent-contacts {
@@ -1537,17 +1572,17 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           align-items: center;
           gap: 6px;
           padding: 4px 10px;
-          background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.15));
           border-radius: 16px;
           font-size: 11px;
-          color: #059669;
+          color: #16a34a;
           font-weight: 500;
         }
 
         .badge-dot {
           width: 6px;
           height: 6px;
-          background: #10b981;
+          background: #22c55e;
           border-radius: 50%;
           animation: pulse 2s infinite;
         }
@@ -1558,7 +1593,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .badge-detail {
-          color: #6b7280;
+          color: #16a34a;
           font-size: 10px;
         }
 
@@ -1567,7 +1602,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           align-items: center;
           gap: 6px;
           font-size: 12px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
         }
 
         .loading-profiles .spinner {
@@ -1588,18 +1623,19 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           border-radius: 12px;
           transition: all 0.2s;
           border: 1px solid transparent;
+          background: rgba(255, 255, 255, 0.5);
         }
 
         .contact-item:hover {
-          background: #f0fdf4;
-          border-color: #d1fae5;
+          background: rgba(132, 204, 22, 0.1);
+          border-color: rgba(132, 204, 22, 0.3);
         }
 
         .contact-avatar {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          background: linear-gradient(135deg, var(--sage-500, #84cc16) 0%, var(--sage-600, #65a30d) 100%);
           color: white;
           display: flex;
           align-items: center;
@@ -1610,7 +1646,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .contact-name {
           font-size: 13px;
-          color: #374151;
+          color: var(--sage-700, #4d7c0f);
           font-weight: 500;
         }
 
@@ -1621,22 +1657,22 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .amount-input-container {
           display: flex;
           align-items: center;
-          background: #f9fafb;
+          background: rgba(255, 255, 255, 0.8);
           border-radius: 12px;
           padding: 4px 16px;
-          border: 2px solid #e5e7eb;
+          border: 2px solid rgba(0, 0, 0, 0.08);
           transition: all 0.3s;
         }
 
         .amount-input-container:focus-within {
-          border-color: #10b981;
+          border-color: var(--sage-500, #84cc16);
           background: white;
         }
 
         .currency-symbol {
           font-size: 28px;
           font-weight: 600;
-          color: #374151;
+          color: var(--sage-700, #4d7c0f);
           margin-right: 8px;
         }
 
@@ -1647,6 +1683,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           font-weight: 600;
           padding: 12px 0 !important;
           box-shadow: none !important;
+          color: var(--sage-800, #166534);
         }
 
         .amount-input:focus {
@@ -1662,20 +1699,20 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .quick-amount-btn {
           padding: 8px 16px;
-          border: 2px solid #e5e7eb;
-          background: white;
+          border: 2px solid rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.8);
           border-radius: 20px;
           cursor: pointer;
           font-weight: 500;
-          color: #374151;
+          color: var(--sage-700, #4d7c0f);
           transition: all 0.2s;
           font-size: 14px;
         }
 
         .quick-amount-btn:hover {
-          border-color: #10b981;
-          color: #059669;
-          background: #f0fdf4;
+          border-color: var(--sage-500, #84cc16);
+          color: var(--sage-600, #65a30d);
+          background: rgba(132, 204, 22, 0.1);
         }
 
         .description-section {
@@ -1687,6 +1724,24 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           padding: 16px;
           font-size: 16px;
           margin-top: 8px;
+          background: linear-gradient(135deg, var(--sage-600, #65a30d) 0%, var(--sage-500, #84cc16) 100%);
+          border: none;
+          color: white;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .btn-send:hover, .btn-request:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(101, 163, 13, 0.3);
+        }
+
+        .btn-send:disabled, .btn-request:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
         }
 
         .qr-section {
@@ -1700,12 +1755,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .qr-info-header h3 {
           font-size: 20px;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
           margin: 0 0 8px 0;
         }
 
         .qr-info-header p {
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           margin: 0;
           font-size: 14px;
         }
@@ -1722,14 +1777,25 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           font-size: 16px;
           font-weight: 600;
           margin-top: 8px;
+          background: linear-gradient(135deg, var(--sage-600, #65a30d) 0%, var(--sage-500, #84cc16) 100%);
+          border: none;
+          color: white;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .btn-generate-qr:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(101, 163, 13, 0.3);
         }
 
         .qr-display-card {
           margin-top: 24px;
           padding: 24px;
-          background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+          background: linear-gradient(135deg, rgba(132, 204, 22, 0.1) 0%, rgba(101, 163, 13, 0.1) 100%);
           border-radius: 20px;
-          border: 2px solid #10b981;
+          border: 2px solid var(--sage-500, #84cc16);
           position: relative;
           overflow: hidden;
         }
@@ -1739,7 +1805,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           top: 0;
           left: 0;
           right: 0;
-          background: linear-gradient(90deg, #10b981, #059669);
+          background: linear-gradient(90deg, var(--sage-500, #84cc16), var(--sage-600, #65a30d));
           color: white;
           padding: 8px 16px;
           display: flex;
@@ -1784,7 +1850,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, var(--copper, #b87333), var(--gold, #c9a227));
           color: white;
           display: flex;
           align-items: center;
@@ -1800,12 +1866,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .qr-user-name {
           font-size: 16px;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
         }
 
         .qr-user-upi {
           font-size: 13px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
         }
 
         .qr-details-card {
@@ -1820,19 +1886,19 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           justify-content: space-between;
           align-items: center;
           padding-bottom: 12px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           margin-bottom: 12px;
         }
 
         .amount-label {
           font-size: 14px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
         }
 
         .amount-value {
           font-size: 24px;
           font-weight: 700;
-          color: #059669;
+          color: var(--sage-600, #65a30d);
         }
 
         .qr-meta-info {
@@ -1849,20 +1915,20 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .meta-label {
           font-size: 12px;
-          color: #9ca3af;
+          color: var(--sage-500, #84cc16);
         }
 
         .meta-value {
           font-size: 12px;
-          color: #374151;
+          color: var(--sage-700, #4d7c0f);
           font-family: monospace;
         }
 
         .meta-value.hash {
-          background: #f3f4f6;
+          background: rgba(132, 204, 22, 0.1);
           padding: 2px 8px;
           border-radius: 4px;
-          color: #6366f1;
+          color: var(--copper, #b87333);
         }
 
         .qr-security-note {
@@ -1872,19 +1938,20 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           gap: 8px;
           margin-top: 16px;
           padding: 12px;
-          background: rgba(16, 185, 129, 0.1);
+          background: rgba(132, 204, 22, 0.1);
           border-radius: 8px;
           font-size: 12px;
-          color: #065f46;
+          color: var(--sage-700, #4d7c0f);
         }
 
         /* Fraud Preview Panel Styles */
         .fraud-preview-panel {
-          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-          border: 1px solid #e2e8f0;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+          border: 1px solid rgba(0, 0, 0, 0.08);
           border-radius: 12px;
           padding: 16px;
           margin: 16px 0;
+          backdrop-filter: blur(10px);
         }
 
         .fraud-preview-panel.high, .fraud-preview-panel.critical {
@@ -1897,7 +1964,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           align-items: center;
           gap: 8px;
           font-weight: 600;
-          color: #475569;
+          color: var(--sage-700, #4d7c0f);
           margin-bottom: 12px;
         }
 
@@ -1925,7 +1992,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .fraud-risk-badge.low {
-          border-left: 4px solid #10b981;
+          border-left: 4px solid var(--sage-500, #84cc16);
         }
 
         .fraud-risk-badge.medium {
@@ -1973,7 +2040,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .risk-factors-preview {
           font-size: 13px;
-          color: #4b5563;
+          color: var(--sage-700, #4d7c0f);
           margin-bottom: 12px;
         }
 
@@ -1988,15 +2055,15 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .fraud-recommendation-preview {
           font-size: 12px;
-          color: #059669;
+          color: var(--sage-700, #4d7c0f);
           font-weight: 500;
           padding: 8px 12px;
-          background: #ecfdf5;
+          background: rgba(132, 204, 22, 0.15);
           border-radius: 6px;
         }
 
         .fraud-preview-loading {
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           font-size: 13px;
           text-align: center;
           padding: 12px;
@@ -2013,12 +2080,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .scan-info h3 {
           font-size: 20px;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
           margin: 0 0 8px;
         }
 
         .scan-info p {
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           margin: 0;
         }
 
@@ -2028,8 +2095,8 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .scanner-placeholder {
           padding: 40px 20px;
-          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-          border: 2px dashed #cbd5e1;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+          border: 2px dashed rgba(132, 204, 22, 0.4);
           border-radius: 16px;
         }
 
@@ -2039,7 +2106,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .scanner-placeholder p {
-          color: #64748b;
+          color: var(--sage-600, #65a30d);
           margin-bottom: 20px;
         }
 
@@ -2047,7 +2114,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           display: flex;
           align-items: center;
           margin: 20px 0;
-          color: #94a3b8;
+          color: var(--sage-500, #84cc16);
         }
 
         .scan-divider::before,
@@ -2055,7 +2122,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           content: '';
           flex: 1;
           height: 1px;
-          background: #e2e8f0;
+          background: rgba(0, 0, 0, 0.1);
         }
 
         .scan-divider span {
@@ -2132,7 +2199,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .scanned-payment-details {
           padding: 20px;
-          background: #f9fafb;
+          background: rgba(255, 255, 255, 0.8);
           border-radius: 12px;
         }
 
@@ -2141,7 +2208,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           align-items: center;
           gap: 12px;
           padding-bottom: 16px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           margin-bottom: 16px;
         }
 
@@ -2149,7 +2216,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           width: 56px;
           height: 56px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          background: linear-gradient(135deg, var(--sage-500, #84cc16) 0%, var(--sage-600, #65a30d) 100%);
           color: white;
           display: flex;
           align-items: center;
@@ -2161,11 +2228,11 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .recipient-name {
           font-weight: 600;
           font-size: 18px;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
         }
 
         .recipient-upi {
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           font-size: 14px;
         }
 
@@ -2174,8 +2241,8 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           align-items: center;
           gap: 6px;
           padding: 8px 14px;
-          background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-          color: #1d4ed8;
+          background: linear-gradient(135deg, rgba(184, 115, 51, 0.1) 0%, rgba(201, 162, 39, 0.1) 100%);
+          color: var(--copper, #b87333);
           border-radius: 20px;
           font-size: 13px;
           font-weight: 500;
@@ -2193,14 +2260,14 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .fixed-amount label {
           display: block;
           font-size: 13px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           margin-bottom: 8px;
         }
 
         .amount-display {
           font-size: 32px;
           font-weight: 700;
-          color: #059669;
+          color: var(--sage-600, #65a30d);
         }
 
         .fraud-warning-inline {
@@ -2226,7 +2293,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         /* Contact Risk Indicators */
         .contact-item.low-risk .contact-avatar {
-          border: 2px solid #10b981;
+          border: 2px solid var(--sage-500, #84cc16);
         }
         
         .contact-item.medium-risk .contact-avatar {
@@ -2260,7 +2327,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .risk-indicator.low {
-          background: #10b981;
+          background: var(--sage-500, #84cc16);
           color: white;
         }
 
@@ -2289,8 +2356,8 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .contact-risk-badge.low {
-          background: #d1fae5;
-          color: #065f46;
+          background: rgba(132, 204, 22, 0.2);
+          color: var(--sage-700, #4d7c0f);
         }
 
         .contact-risk-badge.medium {
@@ -2318,12 +2385,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           padding: 20px;
           border-radius: 16px;
           background: white;
-          border: 1px solid #e5e7eb;
+          border: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         .recipient-fraud-profile.low {
-          border-left: 4px solid #10b981;
-          background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+          border-left: 4px solid var(--sage-500, #84cc16);
+          background: linear-gradient(135deg, rgba(132, 204, 22, 0.1) 0%, rgba(132, 204, 22, 0.05) 100%);
         }
 
         .recipient-fraud-profile.medium {
@@ -2398,13 +2465,13 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .fraud-profile-header .score-label {
           display: block;
           font-size: 11px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
         }
 
         .fraud-profile-header .score-value {
           font-size: 24px;
           font-weight: 700;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
         }
 
         .fraud-profile-stats {
@@ -2424,14 +2491,14 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .fraud-profile-stats .stat-label {
           display: block;
           font-size: 11px;
-          color: #6b7280;
+          color: var(--sage-600, #65a30d);
           margin-bottom: 4px;
         }
 
         .fraud-profile-stats .stat-value {
           font-size: 16px;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--sage-800, #166534);
         }
 
         .fraud-profile-stats .stat-value.flagged {
@@ -2466,8 +2533,8 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         }
 
         .recommendation-box.low {
-          background: #d1fae5;
-          color: #065f46;
+          background: rgba(132, 204, 22, 0.2);
+          color: var(--sage-700, #4d7c0f);
         }
 
         .recommendation-box.medium {
@@ -2498,8 +2565,48 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
         .last-activity {
           font-size: 12px;
-          color: #9ca3af;
+          color: var(--sage-500, #84cc16);
           text-align: right;
+        }
+
+        /* Fraud Service Badge */
+        .fraud-service-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 16px;
+          background: linear-gradient(135deg, rgba(132, 204, 22, 0.15) 0%, rgba(101, 163, 13, 0.15) 100%);
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--sage-700, #4d7c0f);
+          margin-bottom: 16px;
+          border: 1px solid rgba(132, 204, 22, 0.3);
+        }
+
+        .fraud-service-badge .badge-icon {
+          font-size: 16px;
+        }
+
+        /* Alert Styles */
+        .alert {
+          padding: 14px 18px;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        .alert-error {
+          background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+          color: #991b1b;
+          border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+          background: linear-gradient(135deg, rgba(132, 204, 22, 0.15) 0%, rgba(101, 163, 13, 0.15) 100%);
+          color: var(--sage-700, #4d7c0f);
+          border: 1px solid rgba(132, 204, 22, 0.3);
         }
 
         /* Success Animation Styles */
@@ -2645,6 +2752,80 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           .fraud-profile-stats {
             grid-template-columns: repeat(2, 1fr);
           }
+
+          .page-intro {
+            padding: 0 20px;
+          }
+
+          .intro-features {
+            flex-direction: column;
+            gap: 12px;
+          }
+        }
+
+        /* Page Intro Styles */
+        .payment-page {
+          min-height: 100vh;
+          padding: 40px 20px;
+        }
+
+        .page-intro {
+          max-width: 600px;
+          margin: 0 auto 40px;
+          text-align: center;
+        }
+
+        .page-intro .intro-icon {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+          border-radius: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 24px;
+          color: #16a34a;
+        }
+
+        .page-intro h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 36px;
+          font-weight: 600;
+          color: #14532d;
+          margin: 0 0 16px;
+        }
+
+        .page-intro .intro-description {
+          font-size: 16px;
+          line-height: 1.7;
+          color: #16a34a;
+          max-width: 520px;
+          margin: 0 auto 28px;
+        }
+
+        .intro-features {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+
+        .intro-feature {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.6);
+          backdrop-filter: blur(5px);
+          padding: 10px 18px;
+          border-radius: 50px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #15803d;
+          border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .intro-feature .feature-icon {
+          font-size: 16px;
         }
       `}</style>
     </div>

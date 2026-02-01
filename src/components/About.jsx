@@ -3,288 +3,644 @@ import React from 'react'
 export default function About() {
   return (
     <div className="about-container">
-      <div className="about-card">
-        <div className="module-header">
+      {/* Hero Section */}
+      <div className="about-hero">
+        <div className="hero-content">
+          <div className="hero-badge">
+            <span className="badge-icon">🌱</span>
+            <span>Growing Your Financial Future</span>
+          </div>
           <h1>SecureBank</h1>
-          <p className="header-subtitle">Advanced Financial Security Platform</p>
-        </div>
-        
-        <div className="module-content">
-          <section className="about-section">
-            <h2>Project Overview</h2>
-            <p className="module-description">
-              SecureBank is a comprehensive financial management solution designed to 
-              provide users with a secure, intelligent, and user-friendly banking experience. 
-              Our platform combines cutting-edge technologies including Machine Learning for 
-              fraud detection, Blockchain for secure transactions, and Voice Recognition for 
-              hands-free payments.
-            </p>
-          </section>
-
-          <section className="features-section">
-            <h2>Key Features</h2>
-            <div className="features-grid">
-              <div className="feature-card">
-                <div className="feature-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                </div>
-                <h3>ML Fraud Detection</h3>
-                <p>Advanced machine learning algorithms analyze transaction patterns in real-time to detect and prevent fraudulent activities.</p>
-              </div>
-
-              <div className="feature-card">
-                <div className="feature-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
-                  </svg>
-                </div>
-                <h3>Blockchain QR Payments</h3>
-                <p>Secure QR-based transactions powered by blockchain technology ensure tamper-proof and verifiable payments.</p>
-              </div>
-
-              <div className="feature-card">
-                <div className="feature-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="23"/>
-                    <line x1="8" y1="23" x2="16" y2="23"/>
-                  </svg>
-                </div>
-                <h3>Voice Payments</h3>
-                <p>Natural language processing enables hands-free transactions through voice commands, similar to GPay and PhonePe.</p>
-              </div>
-
-              <div className="feature-card">
-                <div className="feature-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                </div>
-                <h3>Real-time Updates</h3>
-                <p>Instant notifications and live balance updates keep you informed about every transaction as it happens.</p>
-              </div>
+          <p className="hero-tagline">Where security meets simplicity in modern banking</p>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <span className="stat-number">99.9%</span>
+              <span className="stat-text">Fraud Detection</span>
             </div>
-          </section>
-
-          <section className="tech-section">
-            <h2>Technology Stack</h2>
-            <div className="tech-grid">
-              <div className="tech-item">
-                <span className="tech-label">Frontend</span>
-                <span className="tech-value">React.js, Vite</span>
-              </div>
-              <div className="tech-item">
-                <span className="tech-label">Backend</span>
-                <span className="tech-value">Flask, Python</span>
-              </div>
-              <div className="tech-item">
-                <span className="tech-label">ML Framework</span>
-                <span className="tech-value">XGBoost, Scikit-learn</span>
-              </div>
-              <div className="tech-item">
-                <span className="tech-label">Real-time</span>
-                <span className="tech-value">WebSocket, Socket.IO</span>
-              </div>
-              <div className="tech-item">
-                <span className="tech-label">Security</span>
-                <span className="tech-value">JWT, AES-256, SHA-256</span>
-              </div>
-              <div className="tech-item">
-                <span className="tech-label">Database</span>
-                <span className="tech-value">SQLAlchemy, SQLite</span>
-              </div>
+            <div className="hero-stat">
+              <span className="stat-number">0.3s</span>
+              <span className="stat-text">Transaction Speed</span>
             </div>
-          </section>
+            <div className="hero-stat">
+              <span className="stat-number">24/7</span>
+              <span className="stat-text">Availability</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Mission Section */}
+      <div className="mission-section">
+        <div className="mission-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h2>Our Mission</h2>
+        <p>
+          SecureBank is a comprehensive financial management solution designed to provide users 
+          with a secure, intelligent, and user-friendly banking experience. We combine cutting-edge 
+          technologies including Machine Learning for fraud detection, Blockchain for secure transactions, 
+          and Voice Recognition for hands-free payments—all wrapped in a beautiful, intuitive interface.
+        </p>
+      </div>
+
+      {/* Features Section */}
+      <div className="features-section">
+        <h2>Powerful Features</h2>
+        <p className="section-subtitle">Everything you need for modern, secure banking</p>
         
-        <div className="team-credits">
-          <h3>Project Team</h3>
-          <p className="credits-text">
-            Developed by Yash Shinde, Prasad Gavhane, and Atharva Ghule
-          </p>
-          <p className="credits-subtitle">Final Year Project • 2026</p>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon-wrapper sage">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3>ML Fraud Detection</h3>
+            <p>Advanced XGBoost algorithms trained on 6M+ transactions analyze patterns in real-time, achieving 99.9% accuracy in detecting fraudulent activities.</p>
+            <div className="feature-tag">AI-Powered</div>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon-wrapper copper">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+              </svg>
+            </div>
+            <h3>Blockchain QR Payments</h3>
+            <p>Every QR transaction is secured with SHA-256 hashing and immutable blockchain ledger, ensuring tamper-proof and verifiable payment records.</p>
+            <div className="feature-tag">Blockchain</div>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon-wrapper gold">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </div>
+            <h3>Voice Payments</h3>
+            <p>Natural language processing enables hands-free transactions. Simply speak your payment commands and our AI understands context, amounts, and recipients.</p>
+            <div className="feature-tag">Voice AI</div>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon-wrapper brown">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            </div>
+            <h3>Real-time Alerts</h3>
+            <p>WebSocket-powered instant notifications keep you informed about every transaction, balance change, and security alert as they happen.</p>
+            <div className="feature-tag">Live</div>
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="how-it-works-section">
+        <h2>How It Works</h2>
+        <p className="section-subtitle">Simple, secure, and seamless</p>
+        
+        <div className="steps-container">
+          <div className="step">
+            <div className="step-number">1</div>
+            <div className="step-content">
+              <h4>Initiate Payment</h4>
+              <p>Use voice, QR scan, or manual entry</p>
+            </div>
+          </div>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">2</div>
+            <div className="step-content">
+              <h4>AI Analysis</h4>
+              <p>ML model analyzes for fraud</p>
+            </div>
+          </div>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">3</div>
+            <div className="step-content">
+              <h4>Secure Processing</h4>
+              <p>Blockchain records transaction</p>
+            </div>
+          </div>
+          <div className="step-connector"></div>
+          <div className="step">
+            <div className="step-number">4</div>
+            <div className="step-content">
+              <h4>Confirmation</h4>
+              <p>Instant notification sent</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Technology Stack */}
+      <div className="tech-section">
+        <h2>Technology Stack</h2>
+        <p className="section-subtitle">Built with modern, robust technologies</p>
+        
+        <div className="tech-categories">
+          <div className="tech-category">
+            <h4>Frontend</h4>
+            <div className="tech-tags">
+              <span className="tech-tag">React.js</span>
+              <span className="tech-tag">Vite</span>
+              <span className="tech-tag">WebSocket</span>
+            </div>
+          </div>
+          <div className="tech-category">
+            <h4>Backend</h4>
+            <div className="tech-tags">
+              <span className="tech-tag">Flask</span>
+              <span className="tech-tag">Python</span>
+              <span className="tech-tag">SQLAlchemy</span>
+            </div>
+          </div>
+          <div className="tech-category">
+            <h4>ML & AI</h4>
+            <div className="tech-tags">
+              <span className="tech-tag">XGBoost</span>
+              <span className="tech-tag">Scikit-learn</span>
+              <span className="tech-tag">PaySim Dataset</span>
+            </div>
+          </div>
+          <div className="tech-category">
+            <h4>Security</h4>
+            <div className="tech-tags">
+              <span className="tech-tag">JWT Auth</span>
+              <span className="tech-tag">AES-256</span>
+              <span className="tech-tag">Blockchain</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Section */}
+      <div className="team-section">
+        <div className="team-header">
+          <h2>Meet Our Team</h2>
+          <p>The minds behind SecureBank</p>
+        </div>
+        <div className="team-members">
+          <div className="team-member">
+            <div className="member-avatar">YS</div>
+            <h4>Yash Shinde</h4>
+            <p>Lead Developer</p>
+          </div>
+          <div className="team-member">
+            <div className="member-avatar">PG</div>
+            <h4>Prasad Gavhane</h4>
+            <p>Backend Engineer</p>
+          </div>
+          <div className="team-member">
+            <div className="member-avatar">AG</div>
+            <h4>Atharva Ghule</h4>
+            <p>ML Engineer</p>
+          </div>
+        </div>
+        <div className="project-info">
+          <span className="project-badge">Final Year Project • 2026</span>
         </div>
       </div>
 
       <style>{`
         .about-container {
-          max-width: 900px;
+          max-width: 960px;
           margin: 0 auto;
         }
 
-        .about-card {
-          background: white;
-          border-radius: 24px;
+        /* Hero Section */
+        .about-hero {
+          background: rgba(255, 255, 253, 0.9);
+          backdrop-filter: blur(20px);
+          border-radius: 28px;
           padding: 48px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-          border: 1px solid #e5e7eb;
-        }
-
-        .module-header {
           text-align: center;
-          margin-bottom: 40px;
-          padding-bottom: 24px;
-          border-bottom: 2px solid #d1fae5;
+          border: 1px solid rgba(212, 218, 201, 0.5);
+          margin-bottom: 32px;
+          position: relative;
+          overflow: hidden;
         }
 
-        .module-header h1 {
-          color: #059669;
-          font-size: 36px;
-          font-weight: 700;
-          margin: 0;
-          font-family: 'Poppins', sans-serif;
+        .about-hero::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #5d7049, #94a37e, #d4a84b, #b87333);
         }
 
-        .header-subtitle {
-          color: #6b7280;
-          font-size: 16px;
-          margin: 8px 0 0;
+        .hero-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(220, 252, 231, 0.6);
+          padding: 8px 20px;
+          border-radius: 24px;
+          font-size: 14px;
+          color: #15803d;
+          margin-bottom: 20px;
         }
 
-        .module-content {
-          margin-bottom: 40px;
+        .badge-icon {
+          font-size: 18px;
         }
 
-        .about-section, .features-section, .tech-section {
-          margin-bottom: 40px;
-        }
-
-        .about-section h2, .features-section h2, .tech-section h2 {
-          color: #1f2937;
-          font-size: 20px;
+        .about-hero h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 48px;
           font-weight: 600;
-          margin: 0 0 16px;
-          font-family: 'Poppins', sans-serif;
+          color: #14532d;
+          margin: 0 0 12px;
+          letter-spacing: 1px;
         }
 
-        .module-description {
+        .hero-tagline {
+          font-size: 18px;
+          color: #16a34a;
+          margin: 0 0 32px;
+        }
+
+        .hero-stats {
+          display: flex;
+          justify-content: center;
+          gap: 48px;
+        }
+
+        .hero-stat {
+          text-align: center;
+        }
+
+        .stat-number {
+          display: block;
+          font-size: 32px;
+          font-weight: 700;
+          color: #15803d;
+          font-family: 'Playfair Display', serif;
+        }
+
+        .stat-text {
+          font-size: 13px;
+          color: #22c55e;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        /* Mission Section */
+        .mission-section {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 24px;
+          padding: 40px;
+          text-align: center;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+          margin-bottom: 32px;
+        }
+
+        .mission-icon {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, rgba(220, 252, 231, 0.8), rgba(187, 247, 208, 0.8));
+          border-radius: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          color: #15803d;
+        }
+
+        .mission-section h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px;
+          color: #14532d;
+          margin: 0 0 16px;
+        }
+
+        .mission-section p {
           font-size: 16px;
-          line-height: 1.8;
-          color: #4b5563;
-          margin: 0;
+          line-height: 1.9;
+          color: #16a34a;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+
+        /* Features Section */
+        .features-section {
+          margin-bottom: 32px;
+        }
+
+        .features-section > h2, .how-it-works-section h2, .tech-section > h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px;
+          color: #14532d;
+          text-align: center;
+          margin: 0 0 8px;
+        }
+
+        .section-subtitle {
+          text-align: center;
+          color: #22c55e;
+          font-size: 15px;
+          margin: 0 0 32px;
         }
 
         .features-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
+          gap: 24px;
         }
 
         .feature-card {
-          padding: 24px;
-          background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-          border-radius: 16px;
-          border: 1px solid #d1fae5;
-          transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 20px;
+          padding: 28px;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .feature-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(16, 185, 129, 0.15);
+          transform: translateY(-6px);
+          box-shadow: 0 16px 48px rgba(22, 163, 74, 0.15);
         }
 
-        .feature-icon {
+        .feature-icon-wrapper {
           width: 56px;
           height: 56px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          border-radius: 12px;
+          border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;
+          margin-bottom: 18px;
+        }
+
+        .feature-icon-wrapper.sage {
+          background: linear-gradient(135deg, #22c55e, #16a34a);
           color: white;
-          margin-bottom: 16px;
+        }
+
+        .feature-icon-wrapper.copper {
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: white;
+        }
+
+        .feature-icon-wrapper.gold {
+          background: linear-gradient(135deg, #4ade80, #22c55e);
+          color: white;
+        }
+
+        .feature-icon-wrapper.brown {
+          background: linear-gradient(135deg, #15803d, #166534);
+          color: white;
         }
 
         .feature-card h3 {
-          color: #059669;
-          font-size: 18px;
-          margin: 0 0 8px;
-          font-family: 'Poppins', sans-serif;
+          font-family: 'Playfair Display', serif;
+          font-size: 20px;
+          color: #14532d;
+          margin: 0 0 10px;
         }
 
         .feature-card p {
-          color: #6b7280;
           font-size: 14px;
-          line-height: 1.6;
-          margin: 0;
+          line-height: 1.7;
+          color: #16a34a;
+          margin: 0 0 16px;
         }
 
-        .tech-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-
-        .tech-item {
-          padding: 16px;
-          background: #f9fafb;
+        .feature-tag {
+          display: inline-block;
+          padding: 4px 12px;
+          background: rgba(220, 252, 231, 0.6);
           border-radius: 12px;
-          border: 1px solid #e5e7eb;
-        }
-
-        .tech-label {
-          display: block;
-          font-size: 12px;
-          color: #6b7280;
+          font-size: 11px;
+          font-weight: 600;
+          color: #15803d;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          margin-bottom: 4px;
         }
 
-        .tech-value {
-          font-size: 14px;
-          font-weight: 600;
-          color: #1f2937;
+        /* How It Works */
+        .how-it-works-section {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 24px;
+          padding: 40px;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+          margin-bottom: 32px;
         }
 
-        .team-credits {
-          text-align: center;
-          padding-top: 32px;
-          border-top: 2px solid #e5e7eb;
+        .steps-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          flex-wrap: wrap;
         }
 
-        .team-credits h3 {
-          color: #374151;
+        .step {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 16px 20px;
+          background: rgba(240, 253, 244, 0.8);
+          border-radius: 14px;
+          border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .step-number {
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
           font-size: 16px;
-          margin: 0 0 12px;
+        }
+
+        .step-content h4 {
+          margin: 0;
+          font-size: 14px;
+          color: #14532d;
           font-weight: 600;
         }
 
-        .credits-text {
-          font-size: 18px;
+        .step-content p {
+          margin: 4px 0 0;
+          font-size: 12px;
+          color: #22c55e;
+        }
+
+        .step-connector {
+          width: 24px;
+          height: 2px;
+          background: linear-gradient(90deg, #86efac, #bbf7d0);
+        }
+
+        /* Tech Section */
+        .tech-section {
+          margin-bottom: 32px;
+        }
+
+        .tech-categories {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+        }
+
+        .tech-category {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 18px;
+          padding: 24px;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .tech-category h4 {
+          margin: 0 0 14px;
+          font-size: 14px;
+          color: #16a34a;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-weight: 600;
+        }
+
+        .tech-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .tech-tag {
+          padding: 6px 14px;
+          background: rgba(220, 252, 231, 0.5);
+          border-radius: 20px;
+          font-size: 13px;
+          color: #15803d;
+          font-weight: 500;
+        }
+
+        /* Team Section */
+        .team-section {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 24px;
+          padding: 40px;
+          text-align: center;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .team-header h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px;
+          color: #14532d;
+          margin: 0 0 8px;
+        }
+
+        .team-header p {
+          color: #22c55e;
+          margin: 0 0 32px;
+        }
+
+        .team-members {
+          display: flex;
+          justify-content: center;
+          gap: 40px;
+          margin-bottom: 32px;
+        }
+
+        .team-member {
+          text-align: center;
+        }
+
+        .member-avatar {
+          width: 72px;
+          height: 72px;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 22px;
+          font-weight: 700;
+          color: white;
+          margin: 0 auto 12px;
+          box-shadow: 0 8px 24px rgba(22, 163, 74, 0.25);
+        }
+
+        .team-member h4 {
+          margin: 0 0 4px;
+          font-size: 16px;
+          color: #14532d;
+        }
+
+        .team-member p {
+          margin: 0;
+          font-size: 13px;
+          color: #22c55e;
+        }
+
+        .project-info {
+          padding-top: 24px;
+          border-top: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .project-badge {
+          display: inline-block;
+          padding: 8px 20px;
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+          border-radius: 20px;
+          font-size: 13px;
           font-weight: 600;
           color: #059669;
-          margin: 0;
-        }
-
-        .credits-subtitle {
-          font-size: 14px;
-          color: #9ca3af;
-          margin: 8px 0 0;
         }
 
         @media (max-width: 768px) {
-          .about-card {
-            padding: 24px;
+          .about-hero {
+            padding: 32px 24px;
           }
 
-          .features-grid {
+          .about-hero h1 {
+            font-size: 36px;
+          }
+
+          .hero-stats {
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .features-grid, .tech-categories {
             grid-template-columns: 1fr;
           }
 
-          .tech-grid {
-            grid-template-columns: repeat(2, 1fr);
+          .steps-container {
+            flex-direction: column;
           }
 
-          .module-header h1 {
-            font-size: 28px;
+          .step-connector {
+            width: 2px;
+            height: 24px;
+          }
+
+          .team-members {
+            flex-direction: column;
+            gap: 24px;
           }
         }
       `}</style>

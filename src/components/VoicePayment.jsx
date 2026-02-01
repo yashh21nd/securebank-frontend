@@ -23,6 +23,8 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
   const [lastPaymentRecipient, setLastPaymentRecipient] = useState('')
   const [datasetStats, setDatasetStats] = useState(null)
   const [contacts, setContacts] = useState([])
+  const [showAmountInput, setShowAmountInput] = useState(false)
+  const [quickPayAmount, setQuickPayAmount] = useState('')
   
   const recognitionRef = useRef(null)
 
@@ -515,67 +517,100 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
   }
 
   return (
-    <div className="voice-container">
-      <div className="voice-card">
-        <div className="voice-header">
-          <h2>Voice Payments</h2>
-          <p>Speak to send money, check balance, or view transactions</p>
-          <div className="voice-balance">
-            <span className="balance-label">Available Balance</span>
-            <span className="balance-amount">₹{balance.toFixed(2)}</span>
+    <div className="voice-payment-page">
+      {/* Page Header with Description */}
+      <div className="page-intro">
+        <div className="intro-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </div>
+        <h1>Voice Payments</h1>
+        <p className="intro-description">
+          Experience the future of banking with hands-free voice commands. Simply speak to send money, 
+          check your balance, or view recent transactions. Our AI-powered voice recognition understands 
+          natural language, making payments as easy as having a conversation.
+        </p>
+        <div className="intro-features">
+          <div className="intro-feature">
+            <span className="feature-icon">🎤</span>
+            <span>Natural Language</span>
+          </div>
+          <div className="intro-feature">
+            <span className="feature-icon">🛡️</span>
+            <span>Fraud Protected</span>
+          </div>
+          <div className="intro-feature">
+            <span className="feature-icon">⚡</span>
+            <span>Instant Processing</span>
           </div>
         </div>
+      </div>
 
-        <div className="voice-content">
-          {/* Fraud Service Status */}
-          {fraudServiceActive && (
-            <div className="fraud-service-badge">
-              <span className="badge-icon">🛡️</span>
-              <span>ML Fraud Protection Active</span>
+      <div className="voice-container">
+        <div className="voice-card">
+          <div className="voice-header">
+            <h2>Voice Payments</h2>
+            <p>Speak to send money, check balance, or view transactions</p>
+            <div className="voice-balance">
+              <span className="balance-label">Available Balance</span>
+              <span className="balance-amount">₹{balance.toFixed(2)}</span>
             </div>
-          )}
+          </div>
 
-          {/* Fraud Warning Modal */}
-          {showFraudWarning && fraudAnalysis && (
-            <div className="fraud-warning-overlay">
-              <div className="fraud-warning-modal">
-                <div className={`fraud-header ${fraudAnalysis.riskLevel}`}>
-                  <span className="fraud-icon">
-                    {fraudAnalysis.shouldBlock ? '🚨' : '⚠️'}
-                  </span>
-                  <h3>
-                    {fraudAnalysis.shouldBlock 
-                      ? 'Transaction Blocked' 
-                      : 'High Risk Transaction Detected'}
-                  </h3>
-                </div>
-                
-                <div className="fraud-content">
-                  <div className="fraud-stats">
-                    <div className="fraud-stat">
-                      <span className="stat-label">Risk Level</span>
-                      <span className={`stat-value risk-${fraudAnalysis.riskLevel}`}>
-                        {fraudAnalysis.riskLevel.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="fraud-stat">
-                      <span className="stat-label">Fraud Probability</span>
-                      <span className="stat-value">
-                        {(fraudAnalysis.fraudProbability * 100).toFixed(1)}%
-                      </span>
-                    </div>
+          <div className="voice-content">
+            {/* Fraud Service Status */}
+            {fraudServiceActive && (
+              <div className="fraud-service-badge">
+                <span className="badge-icon">🛡️</span>
+                <span>ML Fraud Protection Active</span>
+              </div>
+            )}
+
+            {/* Fraud Warning Modal */}
+            {showFraudWarning && fraudAnalysis && (
+              <div className="fraud-warning-overlay">
+                <div className="fraud-warning-modal">
+                  <div className={`fraud-header ${fraudAnalysis.riskLevel}`}>
+                    <span className="fraud-icon">
+                      {fraudAnalysis.shouldBlock ? '🚨' : '⚠️'}
+                    </span>
+                    <h3>
+                      {fraudAnalysis.shouldBlock 
+                        ? 'Transaction Blocked' 
+                        : 'High Risk Transaction Detected'}
+                    </h3>
                   </div>
+                  
+                  <div className="fraud-content">
+                    <div className="fraud-stats">
+                      <div className="fraud-stat">
+                        <span className="stat-label">Risk Level</span>
+                        <span className={`stat-value risk-${fraudAnalysis.riskLevel}`}>
+                          {fraudAnalysis.riskLevel.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="fraud-stat">
+                        <span className="stat-label">Fraud Probability</span>
+                        <span className="stat-value">
+                          {(fraudAnalysis.fraudProbability * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
 
-                  <div className="risk-factors">
-                    <h4>Risk Factors Identified:</h4>
-                    <ul>
-                      {fraudAnalysis.riskFactors.map((factor, idx) => (
-                        <li key={idx}>{factor}</li>
-                      ))}
-                    </ul>
-                  </div>
+                    <div className="risk-factors">
+                      <h4>Risk Factors Identified:</h4>
+                      <ul>
+                        {fraudAnalysis.riskFactors.map((factor, idx) => (
+                          <li key={idx}>{factor}</li>
+                        ))}
+                      </ul>
+                    </div>
 
-                  <p className="fraud-recommendation">
+                    <p className="fraud-recommendation">
                     {fraudAnalysis.recommendation}
                   </p>
                 </div>
@@ -735,7 +770,10 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
                     onClick={() => {
                       setSelectedContact(contact)
                       setContactFraudProfile(contact.fraudProfile)
-                      setTranscript(`Pay to ${contact.full_name}`)
+                      setShowAmountInput(true)
+                      setQuickPayAmount('')
+                      setError('')
+                      setSuccess('')
                     }}
                   >
                     <span className="chip-avatar">
@@ -758,8 +796,63 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
             </div>
           )}
 
+          {/* Quick Pay Amount Input */}
+          {showAmountInput && selectedContact && (
+            <div className="quick-pay-input-section">
+              <div className="quick-pay-header">
+                <h4>Send Money to {selectedContact.full_name}</h4>
+                <button className="close-quick-pay" onClick={() => { setShowAmountInput(false); setSelectedContact(null); setContactFraudProfile(null); setQuickPayAmount(''); }}>×</button>
+              </div>
+              <div className="quick-pay-form">
+                <div className="amount-input-wrapper">
+                  <span className="currency-symbol">₹</span>
+                  <input
+                    type="number"
+                    placeholder="Enter amount"
+                    value={quickPayAmount}
+                    onChange={(e) => setQuickPayAmount(e.target.value)}
+                    className="quick-pay-amount-input"
+                    autoFocus
+                  />
+                </div>
+                <button
+                  className="btn-quick-pay"
+                  disabled={!quickPayAmount || parseFloat(quickPayAmount) <= 0 || loading}
+                  onClick={() => {
+                    const amount = parseFloat(quickPayAmount)
+                    if (amount > 0) {
+                      setShowAmountInput(false)
+                      setConfirmation({
+                        confirmation_required: true,
+                        payment_details: {
+                          amount: amount,
+                          recipient_name: selectedContact.full_name,
+                          receiver_id: selectedContact.id
+                        },
+                        message: `Send ₹${amount} to ${selectedContact.full_name}?`
+                      })
+                    }
+                  }}
+                >
+                  Continue
+                </button>
+              </div>
+              {selectedContact.fraudProfile && (
+                <div className={`quick-pay-risk-indicator ${selectedContact.fraudProfile.riskLevel}`}>
+                  <span className="risk-icon">
+                    {selectedContact.fraudProfile.riskLevel === 'low' && '✓'}
+                    {selectedContact.fraudProfile.riskLevel === 'medium' && '⚠'}
+                    {selectedContact.fraudProfile.riskLevel === 'high' && '⚠'}
+                    {selectedContact.fraudProfile.riskLevel === 'critical' && '🚨'}
+                  </span>
+                  <span>Risk Level: {selectedContact.fraudProfile.riskLevel.toUpperCase()}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Selected Contact Fraud Profile */}
-          {selectedContact && contactFraudProfile && (
+          {selectedContact && contactFraudProfile && !showAmountInput && (
             <div className={`contact-fraud-profile ${contactFraudProfile.riskLevel}`}>
               <div className="profile-header">
                 <div className="profile-avatar">
@@ -838,6 +931,7 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -866,31 +960,98 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
       )}
 
       <style>{`
+        .voice-payment-page {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .page-intro {
+          background: rgba(255, 255, 253, 0.85);
+          backdrop-filter: blur(20px);
+          border-radius: 24px;
+          padding: 36px;
+          text-align: center;
+          border: 1px solid rgba(212, 218, 201, 0.4);
+          margin-bottom: 28px;
+        }
+
+        .intro-icon {
+          width: 72px;
+          height: 72px;
+          background: linear-gradient(135deg, #d4a84b, #b87333);
+          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          color: white;
+          box-shadow: 0 8px 24px rgba(212, 168, 75, 0.3);
+        }
+
+        .page-intro h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 32px;
+          color: #3d4a33;
+          margin: 0 0 14px;
+        }
+
+        .intro-description {
+          font-size: 15px;
+          line-height: 1.8;
+          color: #5d7049;
+          margin: 0 0 24px;
+        }
+
+        .intro-features {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+
+        .intro-feature {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 18px;
+          background: rgba(212, 218, 201, 0.4);
+          border-radius: 24px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #4a5a3c;
+        }
+
+        .intro-feature .feature-icon {
+          font-size: 16px;
+        }
+
         .voice-container {
-          max-width: 480px;
+          max-width: 500px;
           margin: 0 auto;
         }
 
         .voice-card {
-          background: white;
-          border-radius: 24px;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(8px);
+          border-radius: 28px;
           overflow: hidden;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-          border: 1px solid #e5e7eb;
+          box-shadow: 0 12px 48px rgba(22, 163, 74, 0.12);
+          border: 1px solid rgba(34, 197, 94, 0.2);
         }
 
         .voice-header {
-          background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-          padding: 28px;
+          background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+          padding: 32px;
           color: white;
           text-align: center;
         }
 
         .voice-header h2 {
           margin: 0;
-          font-size: 24px;
-          font-family: 'Poppins', sans-serif;
+          font-size: 26px;
+          font-family: 'Playfair Display', serif;
           font-weight: 600;
+          letter-spacing: 0.5px;
         }
 
         .voice-header p {
@@ -900,11 +1061,13 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .voice-balance {
-          margin-top: 16px;
-          padding: 12px 20px;
+          margin-top: 18px;
+          padding: 14px 24px;
           background: rgba(255, 255, 255, 0.2);
-          border-radius: 12px;
+          backdrop-filter: blur(8px);
+          border-radius: 14px;
           display: inline-block;
+          border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .voice-balance .balance-label {
@@ -912,27 +1075,27 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           font-size: 11px;
           opacity: 0.9;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 1px;
         }
 
         .voice-balance .balance-amount {
-          font-size: 24px;
-          font-weight: 700;
-          font-family: 'Poppins', sans-serif;
+          font-size: 28px;
+          font-weight: 600;
+          font-family: 'Playfair Display', serif;
         }
 
         .fraud-service-badge {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-          color: #065f46;
-          padding: 8px 16px;
-          border-radius: 20px;
+          background: linear-gradient(135deg, rgba(220, 252, 231, 0.9) 0%, rgba(187, 247, 208, 0.9) 100%);
+          color: #15803d;
+          padding: 10px 18px;
+          border-radius: 24px;
           font-size: 13px;
           font-weight: 500;
-          margin-bottom: 16px;
-          border: 1px solid #6ee7b7;
+          margin-bottom: 18px;
+          border: 1px solid rgba(34, 197, 94, 0.4);
         }
 
         .fraud-service-badge .badge-icon {
@@ -945,8 +1108,8 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
+          background: rgba(61, 74, 51, 0.7);
+          backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1133,29 +1296,29 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .btn-secondary:hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
+          background: rgba(246, 247, 244, 0.8);
+          border-color: rgba(212, 218, 201, 0.8);
         }
 
         .voice-content {
-          padding: 32px 24px;
+          padding: 36px 28px;
         }
 
         .voice-button-container {
           text-align: center;
-          margin-bottom: 24px;
+          margin-bottom: 28px;
         }
 
         .voice-button {
-          width: 100px;
-          height: 100px;
+          width: 110px;
+          height: 110px;
           border-radius: 50%;
           border: none;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          background: linear-gradient(135deg, #768b5f 0%, #5d7049 100%);
           color: white;
           cursor: pointer;
-          transition: all 0.3s;
-          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 8px 28px rgba(93, 112, 73, 0.35);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1163,8 +1326,8 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .voice-button:hover:not(:disabled) {
-          transform: scale(1.05);
-          box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+          transform: scale(1.08);
+          box-shadow: 0 14px 40px rgba(93, 112, 73, 0.45);
         }
 
         .voice-button:disabled {
@@ -1173,9 +1336,9 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .voice-button.listening {
-          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          background: linear-gradient(135deg, #b87333 0%, #d4a84b 100%);
           animation: pulse 1.5s infinite;
-          box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+          box-shadow: 0 8px 28px rgba(184, 115, 51, 0.4);
         }
 
         @keyframes pulse {
@@ -1184,23 +1347,23 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .voice-status {
-          margin-top: 12px;
+          margin-top: 14px;
           font-size: 14px;
-          color: #6b7280;
+          color: #5d7049;
           font-weight: 500;
         }
 
         .listening-animation {
           display: flex;
           justify-content: center;
-          gap: 4px;
-          margin-top: 12px;
+          gap: 5px;
+          margin-top: 14px;
         }
 
         .wave {
           width: 4px;
           height: 20px;
-          background: #10b981;
+          background: linear-gradient(180deg, #768b5f, #5d7049);
           border-radius: 2px;
           animation: wave 0.8s ease-in-out infinite;
         }
@@ -1215,23 +1378,36 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
 
         .manual-input-form {
           display: flex;
-          gap: 8px;
-          margin-bottom: 20px;
+          gap: 10px;
+          margin-bottom: 24px;
         }
 
         .manual-input {
           flex: 1;
+          background: rgba(255, 254, 249, 0.9);
+          border: 2px solid rgba(212, 218, 201, 0.6);
+          border-radius: 14px;
+        }
+
+        .manual-input:focus {
+          border-color: #768b5f;
+          box-shadow: 0 0 0 4px rgba(118, 139, 95, 0.12);
         }
 
         .btn-submit {
-          padding: 14px 24px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          padding: 14px 28px;
+          background: linear-gradient(135deg, #768b5f 0%, #5d7049 100%);
           color: white;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(93, 112, 73, 0.35);
         }
 
         .btn-submit:disabled {
@@ -1240,76 +1416,79 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .transcript-display {
-          background: #f0fdf4;
-          padding: 16px;
-          border-radius: 12px;
-          margin-bottom: 16px;
-          border: 1px solid #d1fae5;
+          background: rgba(246, 247, 244, 0.8);
+          padding: 18px;
+          border-radius: 14px;
+          margin-bottom: 18px;
+          border: 1px solid rgba(212, 218, 201, 0.6);
         }
 
         .transcript-display label {
-          font-size: 12px;
-          color: #6b7280;
+          font-size: 11px;
+          color: #5d7049;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 1px;
+          font-weight: 600;
         }
 
         .transcript-text {
-          margin: 8px 0 0 0;
+          margin: 10px 0 0 0;
           font-size: 18px;
           font-style: italic;
-          color: #059669;
+          color: #4a5a3c;
         }
 
         .parsed-command {
-          background: #f0fdf4;
-          padding: 16px;
-          border-radius: 12px;
-          margin-bottom: 16px;
-          border: 1px solid #d1fae5;
+          background: rgba(246, 247, 244, 0.8);
+          padding: 18px;
+          border-radius: 14px;
+          margin-bottom: 18px;
+          border: 1px solid rgba(212, 218, 201, 0.6);
         }
 
         .parsed-command label {
-          font-size: 12px;
-          color: #6b7280;
+          font-size: 11px;
+          color: #5d7049;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 1px;
+          font-weight: 600;
         }
 
         .command-info {
-          margin-top: 8px;
+          margin-top: 10px;
         }
 
         .command-info p {
           margin: 0;
           font-size: 16px;
           font-weight: 600;
-          color: #059669;
+          color: #4a5a3c;
         }
 
         .confirmation-dialog {
-          background: #f0fdf4;
-          padding: 24px;
-          border-radius: 16px;
-          border: 2px solid #10b981;
-          margin-bottom: 16px;
+          background: rgba(246, 247, 244, 0.9);
+          padding: 28px;
+          border-radius: 18px;
+          border: 2px solid #94a37e;
+          margin-bottom: 18px;
         }
 
         .confirmation-dialog h3 {
-          margin: 0 0 16px 0;
-          color: #065f46;
-          font-family: 'Poppins', sans-serif;
+          margin: 0 0 18px 0;
+          color: #3d4a33;
+          font-family: 'Playfair Display', serif;
+          font-size: 20px;
         }
 
         .confirmation-details {
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
 
         .confirm-item {
           display: flex;
           justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #d1fae5;
+          padding: 14px 0;
+          border-bottom: 1px solid rgba(212, 218, 201, 0.6);
         }
 
         .confirm-item:last-child {
@@ -1317,39 +1496,42 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .confirm-item .label {
-          color: #6b7280;
+          color: #5d7049;
         }
 
         .confirm-item .value {
           font-weight: 600;
-          color: #1f2937;
+          color: #3d4a33;
         }
 
         .confirm-item .value.amount {
-          font-size: 24px;
-          color: #059669;
+          font-size: 28px;
+          color: #4a5a3c;
+          font-family: 'Playfair Display', serif;
         }
 
         .confirmation-buttons {
           display: flex;
-          gap: 12px;
+          gap: 14px;
         }
 
         .btn-confirm {
           flex: 1;
-          padding: 14px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          padding: 15px;
+          background: linear-gradient(135deg, #768b5f 0%, #5d7049 100%);
           color: white;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-size: 16px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 16px rgba(93, 112, 73, 0.3);
         }
 
         .btn-confirm:hover:not(:disabled) {
-          transform: translateY(-2px);
+          transform: translateY(-3px);
+          box-shadow: 0 6px 24px rgba(93, 112, 73, 0.4);
         }
 
         .btn-confirm:disabled {
@@ -1359,32 +1541,33 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
 
         .btn-cancel {
           flex: 1;
-          padding: 14px;
-          background: #f3f4f6;
-          color: #6b7280;
-          border: none;
-          border-radius: 12px;
+          padding: 15px;
+          background: rgba(253, 252, 247, 0.9);
+          color: #5d7049;
+          border: 2px solid rgba(212, 218, 201, 0.8);
+          border-radius: 14px;
           font-size: 16px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
         }
 
         .btn-cancel:hover:not(:disabled) {
-          background: #e5e7eb;
+          background: rgba(246, 247, 244, 0.9);
+          border-color: #94a37e;
         }
 
         .example-commands {
-          background: #f9fafb;
-          padding: 20px;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
-          margin-bottom: 20px;
+          background: rgba(253, 252, 247, 0.8);
+          padding: 22px;
+          border-radius: 16px;
+          border: 1px solid rgba(212, 218, 201, 0.5);
+          margin-bottom: 24px;
         }
 
         .example-commands h4 {
-          margin: 0 0 12px 0;
-          color: #374151;
+          margin: 0 0 14px 0;
+          color: #3d4a33;
           font-size: 14px;
           font-weight: 600;
         }
@@ -1395,33 +1578,35 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
         }
 
         .example-commands li {
-          color: #6b7280;
-          margin-bottom: 8px;
+          color: #5d7049;
+          margin-bottom: 10px;
           font-style: italic;
         }
 
         /* Contact Suggestions */
         .contact-suggestions {
-          margin-top: 24px;
-          padding: 20px;
-          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-          border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          margin-top: 28px;
+          padding: 24px;
+          background: rgba(253, 252, 247, 0.85);
+          backdrop-filter: blur(10px);
+          border-radius: 18px;
+          border: 1px solid rgba(212, 218, 201, 0.5);
         }
 
         .suggestions-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 16px;
+          margin-bottom: 18px;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
         }
 
         .suggestions-header h4 {
           margin: 0;
-          color: #1f2937;
+          color: #3d4a33;
           font-size: 15px;
+          font-weight: 600;
         }
 
         .dataset-indicator {
@@ -1429,10 +1614,10 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           align-items: center;
           gap: 6px;
           font-size: 11px;
-          color: #059669;
-          background: #d1fae5;
-          padding: 4px 10px;
-          border-radius: 12px;
+          color: #4a5a3c;
+          background: rgba(212, 218, 201, 0.6);
+          padding: 6px 12px;
+          border-radius: 14px;
         }
 
         .pulse-dot {
@@ -1758,6 +1943,132 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           font-size: 11px;
           color: #374151;
           font-weight: 500;
+        }
+
+        /* Quick Pay Input Section */
+        .quick-pay-input-section {
+          margin-top: 20px;
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+          border-radius: 16px;
+          padding: 20px;
+          border: 2px solid #10b981;
+        }
+
+        .quick-pay-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+
+        .quick-pay-header h4 {
+          margin: 0;
+          color: #065f46;
+          font-size: 16px;
+        }
+
+        .close-quick-pay {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: none;
+          background: #d1fae5;
+          color: #065f46;
+          font-size: 20px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .quick-pay-form {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+
+        .amount-input-wrapper {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          background: white;
+          border-radius: 12px;
+          border: 2px solid #a7f3d0;
+          padding: 0 16px;
+        }
+
+        .currency-symbol {
+          font-size: 20px;
+          font-weight: 600;
+          color: #059669;
+        }
+
+        .quick-pay-amount-input {
+          flex: 1;
+          border: none;
+          padding: 14px 8px;
+          font-size: 18px;
+          font-weight: 600;
+          background: transparent;
+          outline: none;
+        }
+
+        .quick-pay-amount-input::-webkit-outer-spin-button,
+        .quick-pay-amount-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        .btn-quick-pay {
+          padding: 14px 28px;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 15px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-quick-pay:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-quick-pay:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .quick-pay-risk-indicator {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          border-radius: 10px;
+          font-size: 13px;
+          font-weight: 500;
+        }
+
+        .quick-pay-risk-indicator.low {
+          background: #d1fae5;
+          color: #065f46;
+        }
+
+        .quick-pay-risk-indicator.medium {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .quick-pay-risk-indicator.high {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        .quick-pay-risk-indicator.critical {
+          background: #7c2d12;
+          color: white;
         }
 
         /* Success Animation */

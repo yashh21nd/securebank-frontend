@@ -305,7 +305,7 @@ export default function App() {
           gap: 16px;
           margin-left: 16px;
           padding-left: 16px;
-          border-left: 1px solid rgba(255, 255, 255, 0.3);
+          border-left: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .user-name {
@@ -314,45 +314,47 @@ export default function App() {
         }
         
         .user-balance {
-          background: white;
-          color: #059669;
-          padding: 8px 16px;
-          border-radius: 20px;
+          background: rgba(253, 252, 247, 0.95);
+          color: #4a5a3c;
+          padding: 10px 18px;
+          border-radius: 24px;
           font-weight: 700;
           font-size: 14px;
+          font-family: 'Playfair Display', serif;
         }
         
         .btn-logout {
-          padding: 8px 16px;
-          background: rgba(255, 255, 255, 0.15);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 8px;
+          padding: 10px 18px;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          border-radius: 12px;
           cursor: pointer;
           color: white;
           font-weight: 500;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
         }
         
         .btn-logout:hover {
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(255, 255, 255, 0.22);
+          transform: translateY(-2px);
         }
         
         .btn-login {
-          padding: 10px 24px;
-          background: white;
-          color: #059669;
+          padding: 12px 28px;
+          background: rgba(253, 252, 247, 0.95);
+          color: #4a5a3c;
           border: none;
-          border-radius: 10px;
+          border-radius: 12px;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
           margin-left: 16px;
         }
         
         .btn-login:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
         }
         
         .modal-overlay {
@@ -361,13 +363,13 @@ export default function App() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(4px);
+          background: rgba(61, 74, 51, 0.6);
+          backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 3000;
-          animation: fadeIn 0.2s ease;
+          animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
@@ -376,78 +378,82 @@ export default function App() {
         }
         
         .modal-card {
-          background: white;
-          padding: 40px;
-          border-radius: 24px;
-          width: 420px;
+          background: rgba(255, 254, 249, 0.98);
+          padding: 48px;
+          border-radius: 28px;
+          width: 440px;
           max-width: 90%;
           position: relative;
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-          animation: slideUp 0.3s ease;
+          box-shadow: 0 30px 60px rgba(61, 74, 51, 0.25);
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
+          from { transform: translateY(30px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
         
         .modal-close {
           position: absolute;
-          top: 16px;
-          right: 20px;
-          background: #f3f4f6;
+          top: 18px;
+          right: 22px;
+          background: rgba(246, 247, 244, 0.9);
           border: none;
           font-size: 20px;
-          color: #6b7280;
+          color: #5d7049;
           cursor: pointer;
-          width: 36px;
-          height: 36px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
         }
         
         .modal-close:hover {
-          background: #e5e7eb;
-          color: #374151;
+          background: rgba(212, 218, 201, 0.8);
+          color: #3d4a33;
         }
         
         .modal-card h2 {
-          margin: 0 0 24px 0;
+          margin: 0 0 28px 0;
           text-align: center;
-          font-family: 'Poppins', sans-serif;
-          color: #1f2937;
+          font-family: 'Playfair Display', serif;
+          color: #3d4a33;
+          font-size: 26px;
         }
         
         .modal-card form {
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 16px;
         }
         
         .btn-demo {
-          padding: 14px;
-          background: #f3f4f6;
-          color: #6b7280;
-          border: none;
-          border-radius: 12px;
+          padding: 15px;
+          background: rgba(246, 247, 244, 0.9);
+          color: #5d7049;
+          border: 2px solid rgba(212, 218, 201, 0.6);
+          border-radius: 14px;
           font-size: 14px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
           width: 100%;
+          font-weight: 500;
         }
         
         .btn-demo:hover {
-          background: #e5e7eb;
+          background: rgba(232, 235, 227, 0.9);
+          border-color: #94a37e;
         }
         
         .auth-error {
-          background: #fef2f2;
-          color: #dc2626;
-          padding: 12px 16px;
-          border-radius: 10px;
+          background: rgba(254, 242, 242, 0.9);
+          color: #b91c1c;
+          padding: 14px 18px;
+          border-radius: 12px;
           margin-bottom: 16px;
           text-align: center;
           font-size: 14px;
@@ -455,15 +461,15 @@ export default function App() {
         
         .auth-switch {
           text-align: center;
-          margin-top: 20px;
-          color: #6b7280;
+          margin-top: 24px;
+          color: #5d7049;
           font-size: 14px;
         }
         
         .auth-switch button {
           background: none;
           border: none;
-          color: #059669;
+          color: #768b5f;
           cursor: pointer;
           font-weight: 600;
           margin-left: 4px;
@@ -471,6 +477,7 @@ export default function App() {
         
         .auth-switch button:hover {
           text-decoration: underline;
+          color: #4a5a3c;
         }
 
         @media (max-width: 900px) {
@@ -480,7 +487,7 @@ export default function App() {
             border-left: none;
             margin-top: 8px;
             padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
             flex-wrap: wrap;
             justify-content: center;
           }

@@ -44,13 +44,15 @@ function AddTransactionForm({ onAddTransaction }) {
       <button 
         onClick={() => setIsOpen(true)}
         style={{
-          padding: '12px 16px',
-          background: '#10b981',
+          padding: '14px 20px',
+          background: 'linear-gradient(135deg, #768b5f 0%, #5d7049 100%)',
           color: 'white',
           border: 'none',
-          borderRadius: '8px',
+          borderRadius: '12px',
           fontWeight: '600',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          boxShadow: '0 4px 16px rgba(93, 112, 73, 0.3)',
+          transition: 'all 0.3s ease'
         }}
       >
         + Add Transaction
@@ -60,14 +62,14 @@ function AddTransactionForm({ onAddTransaction }) {
 
   return (
     <div className="card" style={{ marginTop: 16 }}>
-      <h3 style={{ marginTop: 0 }}>Add New Transaction</h3>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <h3 style={{ marginTop: 0, color: '#3d4a33', fontFamily: "'Playfair Display', serif" }}>Add New Transaction</h3>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <input
           type="text"
           placeholder="Description (e.g., Coffee Shop)"
           value={formData.desc}
           onChange={(e) => setFormData({...formData, desc: e.target.value})}
-          style={{ padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+          style={{ padding: '12px 16px', border: '2px solid #d4dac9', borderRadius: '12px', background: '#fffef9' }}
           required
         />
         <input
@@ -76,13 +78,13 @@ function AddTransactionForm({ onAddTransaction }) {
           placeholder="Amount (negative for expenses)"
           value={formData.amount}
           onChange={(e) => setFormData({...formData, amount: e.target.value})}
-          style={{ padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+          style={{ padding: '12px 16px', border: '2px solid #d4dac9', borderRadius: '12px', background: '#fffef9' }}
           required
         />
         <select
           value={formData.category}
           onChange={(e) => setFormData({...formData, category: e.target.value})}
-          style={{ padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+          style={{ padding: '12px 16px', border: '2px solid #d4dac9', borderRadius: '12px', background: '#fffef9' }}
         >
           {CATEGORIES.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
@@ -93,19 +95,19 @@ function AddTransactionForm({ onAddTransaction }) {
           type="date"
           value={formData.date}
           onChange={(e) => setFormData({...formData, date: e.target.value})}
-          style={{ padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+          style={{ padding: '12px 16px', border: '2px solid #d4dac9', borderRadius: '12px', background: '#fffef9' }}
         />
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 10 }}>
           <button 
             type="submit"
-            style={{ padding: '8px 16px', background: '#0ea5e9', color: 'white', border: 'none', borderRadius: '6px', flex: 1 }}
+            style={{ padding: '12px 20px', background: 'linear-gradient(135deg, #768b5f 0%, #5d7049 100%)', color: 'white', border: 'none', borderRadius: '12px', flex: 1, fontWeight: '600', cursor: 'pointer' }}
           >
             Add Transaction
           </button>
           <button 
             type="button"
             onClick={() => setIsOpen(false)}
-            style={{ padding: '8px 16px', background: '#6b7280', color: 'white', border: 'none', borderRadius: '6px' }}
+            style={{ padding: '12px 20px', background: '#f6f7f4', color: '#5d7049', border: '2px solid #d4dac9', borderRadius: '12px', fontWeight: '600', cursor: 'pointer' }}
           >
             Cancel
           </button>
@@ -134,15 +136,15 @@ function BarChart({data}){
               y={height - barHeight + 5} 
               width={barWidth} 
               height={barHeight} 
-              rx={1} 
-              fill="#7c3aed" 
+              rx={2} 
+              fill="url(#barGradient)" 
             />
             <text 
               x={x + barWidth/2} 
               y={height + 12} 
               fontSize="3" 
               textAnchor="middle" 
-              fill="#374151"
+              fill="#5d7049"
               fontWeight="600"
             >
               {d.month}
@@ -162,6 +164,12 @@ function BarChart({data}){
           </g>
         )
       })}
+      <defs>
+        <linearGradient id="barGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#94a37e" />
+          <stop offset="100%" stopColor="#5d7049" />
+        </linearGradient>
+      </defs>
     </svg>
   )
 }
@@ -172,7 +180,7 @@ function Donut({data}){
   const radius = 50
   const circumference = 2*Math.PI*radius
   let offset = 0
-  const colors = ['#ef4444','#f59e0b','#60a5fa','#34d399']
+  const colors = ['#5d7049','#94a37e','#b87333','#d4a84b']
   return (
     <svg className="donut" viewBox="0 0 120 120" width={160} height={160}>
       <g transform="translate(60,60)">
@@ -194,7 +202,7 @@ function Donut({data}){
             />
           )
         })}
-        <text x={0} y={4} textAnchor="middle" fontSize={10} fill="#0f1724">{`₹${total.toFixed(2)}`}</text>
+        <text x={0} y={4} textAnchor="middle" fontSize={10} fill="#3d4a33" fontWeight="600">{`₹${total.toFixed(2)}`}</text>
       </g>
     </svg>
   )
