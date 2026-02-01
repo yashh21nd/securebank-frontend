@@ -2778,29 +2778,32 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         .page-intro .intro-icon {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+          background: rgba(255, 255, 255, 0.9);
           border-radius: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 24px;
           color: #16a34a;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .page-intro h1 {
           font-family: 'Playfair Display', serif;
           font-size: 36px;
           font-weight: 600;
-          color: #14532d;
+          color: #ffffff;
           margin: 0 0 16px;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .page-intro .intro-description {
           font-size: 16px;
           line-height: 1.7;
-          color: #16a34a;
+          color: #ffffff;
           max-width: 520px;
           margin: 0 auto 28px;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .intro-features {
@@ -2814,14 +2817,15 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           display: flex;
           align-items: center;
           gap: 8px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(5px);
           padding: 10px 18px;
           border-radius: 50px;
           font-size: 14px;
           font-weight: 500;
           color: #15803d;
-          border: 1px solid rgba(34, 197, 94, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .intro-feature .feature-icon {
