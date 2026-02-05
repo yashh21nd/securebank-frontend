@@ -4,6 +4,7 @@ import About from './components/About'
 import Payment from './components/Payment'
 import VoicePayment from './components/VoicePayment'
 import NotificationCenter from './components/NotificationCenter'
+import Profile from './components/Profile'
 import { authAPI, getAuthToken, setAuthToken, clearAuthToken } from './services/api'
 
 export default function App() {
@@ -157,6 +158,14 @@ export default function App() {
           >
             About
           </button>
+          {isLoggedIn && (
+            <button 
+              onClick={() => setActiveSection('profile')} 
+              className={`nav-link ${activeSection === 'profile' ? 'active' : ''}`}
+            >
+              Profile
+            </button>
+          )}
           
           {isLoggedIn ? (
             <div className="user-menu">
@@ -199,6 +208,13 @@ export default function App() {
             isLoggedIn={isLoggedIn}
             currentBalance={balance}
             onTransactionAdd={handleTransactionAdd}
+          />
+        )}
+        {activeSection === 'profile' && (
+          <Profile 
+            user={user} 
+            isLoggedIn={isLoggedIn}
+            onUserUpdate={(updatedUser) => setUser(updatedUser)}
           />
         )}
         {activeSection === 'about' && <About />}

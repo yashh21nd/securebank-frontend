@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { paymentAPI, userAPI, blockchainAPI, getAuthToken } from '../services/api'
+import { paymentAPI, userAPI, blockchainAPI, getAuthToken, pinAPI } from '../services/api'
 import { analyzeTransaction, checkFraudServiceHealth, getContactFraudProfile, getDatasetStats } from '../services/fraudDetection'
 
 export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransactionAdd }) {
@@ -28,6 +28,16 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
   const [lastPaymentDetails, setLastPaymentDetails] = useState(null)
+  
+  // PIN verification states
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const [pinError, setPinError] = useState('')
+  const [pinVerifying, setPinVerifying] = useState(false)
+  const [pendingPaymentData, setPendingPaymentData] = useState(null)
+  const [pinStatus, setPinStatus] = useState({ has_pin: false })
+  const [postPaymentAnalysis, setPostPaymentAnalysis] = useState(null)
+  const [showPostPaymentModal, setShowPostPaymentModal] = useState(false)
 
   // Base contact info - fraud profiles will be loaded from dataset
   const baseContacts = [
@@ -102,7 +112,20 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
     }
     
     loadFraudProfiles()
+    loadPinStatus()
   }, [])
+
+  // Load PIN status
+  const loadPinStatus = async () => {
+    try {
+      const status = await pinAPI.getStatus()
+      setPinStatus(status)
+    } catch (err) {
+      console.error('Failed to load PIN status:', err)
+      // Default to has_pin: true for demo
+      setPinStatus({ has_pin: true })
+    }
+  }
 
   // Load balance on mount
   useEffect(() => {
@@ -347,7 +370,7 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
       if (fraudResult.shouldBlock) {
         setShowFraudWarning(true)
         setLoading(false)
-        setError(`🚨 Transaction Blocked: ${fraudResult.recommendation}`)
+        setError('Transaction Blocked: ' + fraudResult.recommendation)
         return
       }
 
@@ -362,7 +385,43 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
       // Continue with transaction if fraud service is down
     }
 
-    await processPayment(amountNum)
+    // Require PIN verification before processing payment
+    setPendingPaymentData({ amount: amountNum, fraudAnalysis: fraudAnalysis })
+    setShowPinModal(true)
+    setLoading(false)
+  }
+
+  // Verify PIN and process payment
+  const handlePinVerification = async () => {
+    if (pinInput.length !== 4) {
+      setPinError('Please enter a 4-digit PIN')
+      return
+    }
+
+    setPinVerifying(true)
+    setPinError('')
+
+    try {
+      await pinAPI.verify(pinInput)
+      // PIN verified, process payment
+      setShowPinModal(false)
+      setPinInput('')
+      if (pendingPaymentData) {
+        await processPayment(pendingPaymentData.amount)
+      }
+    } catch (err) {
+      setPinError(err.message || 'Invalid PIN')
+    } finally {
+      setPinVerifying(false)
+    }
+  }
+
+  const cancelPinVerification = () => {
+    setShowPinModal(false)
+    setPinInput('')
+    setPinError('')
+    setPendingPaymentData(null)
+    setLoading(false)
   }
 
   const processPayment = async (amountNum) => {
@@ -463,7 +522,10 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
   const confirmRiskyPayment = () => {
     const amountNum = parseFloat(amount)
-    processPayment(amountNum)
+    // Require PIN for risky payments too
+    setPendingPaymentData({ amount: amountNum, fraudAnalysis: fraudAnalysis })
+    setShowFraudWarning(false)
+    setShowPinModal(true)
   }
 
   const cancelRiskyPayment = () => {
@@ -619,15 +681,23 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
         </p>
         <div className="intro-features">
           <div className="intro-feature">
-            <span className="feature-icon">🔒</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
             <span>Bank-grade Security</span>
           </div>
           <div className="intro-feature">
-            <span className="feature-icon">📱</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
             <span>QR Payments</span>
           </div>
           <div className="intro-feature">
-            <span className="feature-icon">🛡️</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
             <span>Fraud Protected</span>
           </div>
         </div>
@@ -682,7 +752,9 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
             {/* Fraud Detection Service Status */}
             {fraudServiceActive && (
               <div className="fraud-service-badge">
-                <span className="badge-icon">🛡️</span>
+                <svg className="badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
                 <span>ML Fraud Protection Active</span>
               </div>
             )}
@@ -692,9 +764,13 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
             <div className="fraud-warning-overlay">
               <div className="fraud-warning-modal">
                 <div className={`fraud-header ${fraudAnalysis.riskLevel}`}>
-                  <span className="fraud-icon">
-                    {fraudAnalysis.shouldBlock ? '🚨' : '⚠️'}
-                  </span>
+                  <svg className="fraud-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    {fraudAnalysis.shouldBlock ? (
+                      <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>
+                    ) : (
+                      <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>
+                    )}
+                  </svg>
                   <h3>
                     {fraudAnalysis.shouldBlock 
                       ? 'Transaction Blocked' 
@@ -746,6 +822,100 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                     onClick={cancelRiskyPayment}
                   >
                     Cancel Transaction
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PIN Verification Modal */}
+          {showPinModal && (
+            <div className="pin-modal-overlay">
+              <div className="pin-modal">
+                <div className="pin-modal-header">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <h3>Enter Security PIN</h3>
+                  <p>Verify your identity to complete this payment</p>
+                </div>
+
+                <div className="pin-modal-content">
+                  {pendingPaymentData && (
+                    <div className="pin-payment-summary">
+                      <div className="summary-row">
+                        <span>Amount:</span>
+                        <strong>₹{pendingPaymentData.amount?.toLocaleString()}</strong>
+                      </div>
+                      <div className="summary-row">
+                        <span>To:</span>
+                        <strong>{recipient?.full_name || recipient?.username}</strong>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pin-input-container">
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength="4"
+                      value={pinInput}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '')
+                        setPinInput(val)
+                        setPinError('')
+                      }}
+                      placeholder="****"
+                      className="pin-input-field"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && pinInput.length === 4) {
+                          handlePinVerification()
+                        }
+                      }}
+                    />
+                    <div className="pin-dots">
+                      {[0, 1, 2, 3].map(i => (
+                        <span key={i} className={`pin-dot ${pinInput.length > i ? 'filled' : ''}`}></span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {pinError && (
+                    <div className="pin-error">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                      {pinError}
+                    </div>
+                  )}
+
+                  <p className="pin-hint">Demo PIN: 1234</p>
+                </div>
+
+                <div className="pin-modal-actions">
+                  <button 
+                    className="btn-primary"
+                    onClick={handlePinVerification}
+                    disabled={pinVerifying || pinInput.length !== 4}
+                  >
+                    {pinVerifying ? (
+                      <>
+                        <span className="spinner-small"></span>
+                        Verifying...
+                      </>
+                    ) : (
+                      'Confirm Payment'
+                    )}
+                  </button>
+                  <button 
+                    className="btn-secondary"
+                    onClick={cancelPinVerification}
+                  >
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -817,10 +987,10 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                               {(c.full_name || c.username)[0].toUpperCase()}
                               {c.fraudProfile && (
                                 <span className={`risk-indicator ${c.fraudProfile.riskLevel}`}>
-                                  {c.fraudProfile.riskLevel === 'low' && '✓'}
+                                  {c.fraudProfile.riskLevel === 'low' && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
                                   {c.fraudProfile.riskLevel === 'medium' && '!'}
-                                  {c.fraudProfile.riskLevel === 'high' && '⚠'}
-                                  {c.fraudProfile.riskLevel === 'critical' && '🚨'}
+                                  {c.fraudProfile.riskLevel === 'high' && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+                                  {c.fraudProfile.riskLevel === 'critical' && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>}
                                 </span>
                               )}
                             </div>
@@ -859,12 +1029,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                   {selectedContactFraudInfo && (
                     <div className={`recipient-fraud-profile ${selectedContactFraudInfo.riskLevel}`}>
                       <div className="fraud-profile-header">
-                        <span className="profile-icon">
-                          {selectedContactFraudInfo.riskLevel === 'low' && '✅'}
-                          {selectedContactFraudInfo.riskLevel === 'medium' && '⚠️'}
-                          {selectedContactFraudInfo.riskLevel === 'high' && '🔴'}
-                          {selectedContactFraudInfo.riskLevel === 'critical' && '🚨'}
-                        </span>
+                        <svg className="profile-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          {selectedContactFraudInfo.riskLevel === 'low' && <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>}
+                          {selectedContactFraudInfo.riskLevel === 'medium' && <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>}
+                          {selectedContactFraudInfo.riskLevel === 'high' && <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>}
+                          {selectedContactFraudInfo.riskLevel === 'critical' && <><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>}
+                        </svg>
                         <div className="profile-title">
                           <h4>Recipient Risk Profile</h4>
                           <span className={`risk-badge ${selectedContactFraudInfo.riskLevel}`}>
@@ -900,7 +1070,13 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
                       {selectedContactFraudInfo.riskFactors && selectedContactFraudInfo.riskFactors.length > 0 && (
                         <div className="risk-factors-section">
-                          <h5>⚠️ Risk Factors Identified</h5>
+                          <h5>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            Risk Factors Identified
+                          </h5>
                           <ul>
                             {selectedContactFraudInfo.riskFactors.map((factor, idx) => (
                               <li key={idx}>{factor}</li>
@@ -965,19 +1141,21 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
               {recipient && amount && parseFloat(amount) > 0 && (
                 <div className="fraud-preview-panel">
                   <div className="fraud-preview-header">
-                    <span className="fraud-icon">🛡️</span>
+                    <svg className="fraud-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
                     <span>ML Fraud Analysis</span>
-                    {isAnalyzing && <span className="analyzing-spinner">⏳</span>}
+                    {isAnalyzing && <span className="analyzing-spinner"></span>}
                   </div>
                   {fraudAnalysis && !isAnalyzing && (
                     <div className="fraud-preview-content">
                       <div className={`fraud-risk-badge ${fraudAnalysis.riskLevel}`}>
-                        <span className="risk-indicator">
-                          {fraudAnalysis.riskLevel === 'low' && '✅'}
-                          {fraudAnalysis.riskLevel === 'medium' && '⚠️'}
-                          {fraudAnalysis.riskLevel === 'high' && '🔴'}
-                          {fraudAnalysis.riskLevel === 'critical' && '🚨'}
-                        </span>
+                        <svg className="risk-indicator" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          {fraudAnalysis.riskLevel === 'low' && <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>}
+                          {fraudAnalysis.riskLevel === 'medium' && <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>}
+                          {fraudAnalysis.riskLevel === 'high' && <><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>}
+                          {fraudAnalysis.riskLevel === 'critical' && <><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>}
+                        </svg>
                         <span className="risk-text">
                           {fraudAnalysis.riskLevel.toUpperCase()} RISK
                         </span>
@@ -987,7 +1165,11 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                       </div>
                       {fraudAnalysis.isFraud && (
                         <div className="fraud-alert-inline">
-                          ⚠️ This transaction has been flagged as potentially fraudulent
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                          </svg>
+                          This transaction has been flagged as potentially fraudulent
                         </div>
                       )}
                       {fraudAnalysis.riskFactors && fraudAnalysis.riskFactors.length > 0 && (
@@ -1025,7 +1207,11 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
           {activeTab === 'scan' && (
             <div className="scan-qr-section">
               <div className="scan-info">
-                <h3>📷 Scan QR Code to Pay</h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <h3>Scan QR Code to Pay</h3>
                 <p>Scan any SecureBank QR code to make instant payments</p>
               </div>
 
@@ -1043,7 +1229,12 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                     </div>
                   ) : (
                     <div className="scanner-placeholder">
-                      <div className="scanner-icon">📱</div>
+                      <div className="scanner-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                          <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                      </div>
                       <p>Position the QR code within the frame</p>
                       <button className="btn-primary" onClick={startQRScanner}>
                         Start Camera Scanner
@@ -1060,7 +1251,10 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
               ) : (
                 <div className="scan-result">
                   <div className="scan-success-header">
-                    <span className="success-icon">✅</span>
+                    <svg className="success-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
                     <h3>QR Code Scanned Successfully</h3>
                   </div>
 
@@ -1077,7 +1271,11 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
 
                     {scanResult.data.blockchain_verified && (
                       <div className="blockchain-badge">
-                        <span>🔗</span> Blockchain Verified QR
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        Blockchain Verified QR
                       </div>
                     )}
 
@@ -1106,14 +1304,23 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                     {(amount || scanResult.data.amount) && fraudAnalysis && (
                       <div className={`fraud-preview-panel ${fraudAnalysis.riskLevel}`}>
                         <div className="fraud-preview-header">
-                          <span>🛡️ ML Risk Analysis</span>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                          </svg>
+                          <span>ML Risk Analysis</span>
                         </div>
                         <div className={`fraud-risk-badge ${fraudAnalysis.riskLevel}`}>
                           <span>{fraudAnalysis.riskLevel.toUpperCase()} RISK</span>
                           <span>{(fraudAnalysis.fraudProbability * 100).toFixed(1)}%</span>
                         </div>
                         {fraudAnalysis.isFraud && (
-                          <div className="fraud-warning-inline">⚠️ Potential fraud detected</div>
+                          <div className="fraud-warning-inline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            Potential fraud detected
+                          </div>
                         )}
                       </div>
                     )}
@@ -1337,7 +1544,9 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
                   </div>
 
                   <div className="qr-security-note">
-                    <span>🛡️</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
                     <span>Secured with ML fraud detection & blockchain verification</span>
                   </div>
                 </div>

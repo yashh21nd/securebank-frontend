@@ -398,6 +398,99 @@ export const speechAPI = {
   getSupportedCommands: () => apiRequest('/speech/supported-commands'),
 };
 
+// PIN Management APIs
+export const pinAPI = {
+  getStatus: async () => {
+    if (!authToken || authToken.startsWith('demo-') || !isBackendAvailable) {
+      // Demo mode - return status from local storage
+      const demoHasPin = localStorage.getItem('securebank_demo_pin') !== null;
+      return {
+        has_pin: demoHasPin,
+        is_locked: false,
+        attempts_remaining: 3
+      };
+    }
+    return apiRequest('/pin/status');
+  },
+
+  setup: async (pin, confirmPin) => {
+    if (!authToken || authToken.startsWith('demo-') || !isBackendAvailable) {
+      // Demo mode - store PIN locally
+      if (pin !== confirmPin) {
+        throw new Error('PINs do not match');
+      }
+      if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        throw new Error('PIN must be exactly 4 digits');
+      }
+      localStorage.setItem('securebank_demo_pin', pin);
+      return {
+        message: 'Security PIN set successfully',
+        has_pin: true
+      };
+    }
+    return apiRequest('/pin/setup', {
+      method: 'POST',
+      body: JSON.stringify({ pin, confirm_pin: confirmPin }),
+    });
+  },
+
+  verify: async (pin) => {
+    if (!authToken || authToken.startsWith('demo-') || !isBackendAvailable) {
+      // Demo mode - verify against local storage
+      const storedPin = localStorage.getItem('securebank_demo_pin') || '1234';
+      if (pin === storedPin) {
+        return { verified: true, message: 'PIN verified' };
+      } else {
+        throw new Error('Incorrect PIN. Demo PIN is 1234');
+      }
+    }
+    return apiRequest('/pin/verify', {
+      method: 'POST',
+      body: JSON.stringify({ pin }),
+    });
+  },
+
+  change: async (currentPin, newPin, confirmPin) => {
+    if (!authToken || authToken.startsWith('demo-') || !isBackendAvailable) {
+      // Demo mode - change PIN locally
+      const storedPin = localStorage.getItem('securebank_demo_pin') || '1234';
+      if (currentPin !== storedPin) {
+        throw new Error('Current PIN is incorrect');
+      }
+      if (newPin !== confirmPin) {
+        throw new Error('New PINs do not match');
+      }
+      if (newPin.length !== 4 || !/^\d+$/.test(newPin)) {
+        throw new Error('PIN must be exactly 4 digits');
+      }
+      localStorage.setItem('securebank_demo_pin', newPin);
+      return { message: 'PIN changed successfully' };
+    }
+    return apiRequest('/pin/change', {
+      method: 'POST',
+      body: JSON.stringify({ current_pin: currentPin, new_pin: newPin, confirm_pin: confirmPin }),
+    });
+  },
+
+  reset: async (password, newPin, confirmPin) => {
+    if (!authToken || authToken.startsWith('demo-') || !isBackendAvailable) {
+      // Demo mode - reset PIN (password check skipped)
+      if (newPin !== confirmPin) {
+        throw new Error('PINs do not match');
+      }
+      if (newPin.length !== 4 || !/^\d+$/.test(newPin)) {
+        throw new Error('PIN must be exactly 4 digits');
+      }
+      localStorage.setItem('securebank_demo_pin', newPin);
+      return { message: 'PIN reset successfully' };
+    }
+    return apiRequest('/pin/reset', {
+      method: 'POST',
+      body: JSON.stringify({ password, new_pin: newPin, confirm_pin: confirmPin }),
+    });
+  },
+};
+
 export default {
   auth: authAPI,
   user: userAPI,
@@ -406,4 +499,5 @@ export default {
   blockchain: blockchainAPI,
   fraud: fraudAPI,
   speech: speechAPI,
+  pin: pinAPI,
 };
