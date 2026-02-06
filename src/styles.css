@@ -1275,3 +1275,582 @@ input::placeholder {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ===== ENHANCED MOBILE RESPONSIVE STYLES ===== */
+
+/* Extra small devices (phones, 480px and down) */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .app-header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .brand h1 {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+  }
+
+  .nav-links {
+    width: 100%;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-link {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .app-main {
+    padding: 16px 12px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .kpi {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .kpi h3 {
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+
+  .kpi p {
+    font-size: 24px;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  input, select, textarea {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .about-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .module-header h1 {
+    font-size: 24px;
+  }
+
+  .module-description {
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .app-footer {
+    padding: 16px;
+  }
+
+  .footer-content {
+    font-size: 12px;
+  }
+
+  /* Payment Page Mobile */
+  .payment-container {
+    margin: 0 8px;
+    border-radius: 16px;
+  }
+
+  .payment-card {
+    border-radius: 16px;
+  }
+
+  .payment-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .payment-header h2 {
+    font-size: 20px;
+  }
+
+  .balance-display {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .payment-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .payment-tabs .tab {
+    padding: 10px 16px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .payment-content {
+    padding: 16px;
+  }
+
+  .contacts-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .contact-item {
+    padding: 10px 6px;
+  }
+
+  .contact-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .contact-name {
+    font-size: 11px;
+  }
+
+  .amount-input-container {
+    flex-direction: column;
+  }
+
+  .amount-input {
+    font-size: 28px;
+    text-align: center;
+  }
+
+  .quick-amounts {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .quick-amount-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  /* Search Results Mobile */
+  .search-results {
+    max-height: 200px;
+  }
+
+  .search-result-item {
+    padding: 10px 12px;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+
+  .user-upi {
+    font-size: 11px;
+  }
+
+  /* Fraud Analysis Mobile */
+  .fraud-preview-panel {
+    padding: 12px;
+  }
+
+  .fraud-preview-header {
+    font-size: 13px;
+  }
+
+  .fraud-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .fraud-warning-modal {
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .fraud-header {
+    padding: 16px;
+  }
+
+  .fraud-header h3 {
+    font-size: 16px;
+  }
+
+  .fraud-content {
+    padding: 16px;
+  }
+
+  .fraud-actions {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  /* PIN Modal Mobile */
+  .pin-modal {
+    width: 95%;
+  }
+
+  .pin-modal-header {
+    padding: 24px 16px 20px;
+  }
+
+  .pin-modal-header h3 {
+    font-size: 18px;
+  }
+
+  .pin-modal-content {
+    padding: 16px;
+  }
+
+  .pin-input-field {
+    width: 150px;
+    height: 48px;
+    font-size: 24px;
+    letter-spacing: 12px;
+  }
+
+  /* Voice Payment Mobile */
+  .voice-container {
+    margin: 0 8px;
+  }
+
+  .voice-card {
+    border-radius: 16px;
+  }
+
+  .voice-header {
+    padding: 16px;
+  }
+
+  .voice-header h2 {
+    font-size: 20px;
+  }
+
+  .mic-button {
+    width: 80px;
+    height: 80px;
+  }
+
+  .command-examples {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .example-card {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  /* Page Intro Mobile */
+  .page-intro {
+    padding: 0 12px;
+    margin-bottom: 24px;
+  }
+
+  .page-intro .intro-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  .page-intro h1 {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .page-intro .intro-description {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .intro-features {
+    gap: 10px;
+  }
+
+  .intro-feature {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  /* QR Scanner Mobile */
+  .scanner-container {
+    padding: 16px;
+  }
+
+  .qr-display-card {
+    padding: 16px;
+  }
+
+  /* Profile Page Mobile */
+  .profile-page {
+    padding: 16px 12px;
+  }
+
+  .profile-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profile-tabs .tab {
+    padding: 12px 16px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .profile-content {
+    padding: 16px;
+  }
+
+  .profile-card {
+    padding: 16px;
+  }
+
+  /* Dashboard Mobile */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tx-item {
+    padding: 12px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tx-item .amount {
+    font-size: 16px;
+  }
+
+  /* Success Animation Mobile */
+  .success-animation-content {
+    padding: 0 16px;
+  }
+
+  .coin {
+    width: 80px;
+    height: 80px;
+  }
+
+  .coin-front, .coin-back {
+    font-size: 32px;
+  }
+
+  .success-text h2 {
+    font-size: 22px;
+  }
+
+  .amount-display {
+    font-size: 32px;
+  }
+
+  .recipient-display {
+    font-size: 14px;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .app-header {
+    padding: 14px 24px;
+  }
+
+  .logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .brand h1 {
+    font-size: 22px;
+  }
+
+  .app-main {
+    padding: 20px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .kpi p {
+    font-size: 28px;
+  }
+
+  .contacts-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .contact-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .payment-tabs .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .fraud-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-intro h1 {
+    font-size: 30px;
+  }
+
+  .intro-features {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+  .nav-link,
+  .btn-primary,
+  .btn-secondary,
+  .tab,
+  .contact-item,
+  .search-result-item,
+  .quick-amount-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .nav-link:active,
+  .btn-primary:active,
+  .btn-secondary:active,
+  .tab:active,
+  .contact-item:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  /* Increase touch target sizes */
+  .contact-item {
+    min-height: 70px;
+  }
+
+  .search-result-item {
+    min-height: 56px;
+  }
+
+  .quick-amount-btn {
+    min-height: 44px;
+  }
+
+  /* Remove hover effects on touch */
+  .card:hover,
+  .kpi:hover {
+    transform: none;
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    padding: 8px 16px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand h1 {
+    font-size: 18px;
+  }
+
+  .page-intro {
+    margin-bottom: 16px;
+  }
+
+  .page-intro .intro-icon {
+    display: none;
+  }
+
+  .page-intro h1 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .page-intro .intro-description {
+    display: none;
+  }
+
+  .fraud-warning-modal,
+  .pin-modal {
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+}
+
+/* Safe area insets for modern phones with notches */
+@supports (padding: max(0px)) {
+  .app-header {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+
+  .app-main {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .app-footer {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .fraud-warning-overlay,
+  .pin-modal-overlay,
+  .success-animation-overlay {
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+}

@@ -149,34 +149,105 @@ export default function Payment({ user, onBalanceUpdate, isLoggedIn, onTransacti
     }
   }
 
+  // Fuzzy search helper function for better name matching
+  const fuzzyMatch = (text, query) => {
+    const textLower = text.toLowerCase()
+    const queryLower = query.toLowerCase()
+    
+    // Direct match
+    if (textLower.includes(queryLower)) return { match: true, score: 100 }
+    
+    // Split query into words and check if all words match
+    const queryWords = queryLower.split(/\s+/)
+    const textWords = textLower.split(/\s+/)
+    
+    let matchedWords = 0
+    for (const qWord of queryWords) {
+      for (const tWord of textWords) {
+        if (tWord.startsWith(qWord) || tWord.includes(qWord)) {
+          matchedWords++
+          break
+        }
+      }
+    }
+    
+    if (matchedWords === queryWords.length) return { match: true, score: 80 }
+    
+    // Partial first letter match for each word
+    const queryInitials = queryWords.map(w => w[0]).join('')
+    const textInitials = textWords.map(w => w[0]).join('')
+    if (textInitials.includes(queryInitials)) return { match: true, score: 60 }
+    
+    // Levenshtein-like similarity for typo tolerance
+    let matches = 0
+    for (let i = 0; i < queryLower.length; i++) {
+      if (textLower.includes(queryLower[i])) matches++
+    }
+    const similarity = matches / queryLower.length
+    if (similarity > 0.7) return { match: true, score: Math.floor(similarity * 50) }
+    
+    return { match: false, score: 0 }
+  }
+
   const handleSearch = async (query) => {
     setSearchQuery(query)
-    if (query.length < 2) {
+    if (query.length < 1) {
       setSearchResults([])
       return
     }
 
-    // Filter demo contacts for demo mode
+    // Filter demo contacts for demo mode with improved fuzzy matching
     if (!getAuthToken() || getAuthToken()?.startsWith('demo-')) {
-      const filtered = contacts.filter(c => 
-        c.full_name.toLowerCase().includes(query.toLowerCase()) ||
-        c.username.toLowerCase().includes(query.toLowerCase()) ||
-        c.upi_id.toLowerCase().includes(query.toLowerCase())
-      )
-      setSearchResults(filtered)
+      const scoredResults = contacts
+        .map(c => {
+          const nameMatch = fuzzyMatch(c.full_name, query)
+          const usernameMatch = fuzzyMatch(c.username, query)
+          const upiMatch = fuzzyMatch(c.upi_id, query)
+          const bestScore = Math.max(nameMatch.score, usernameMatch.score, upiMatch.score)
+          return { 
+            contact: c, 
+            score: bestScore,
+            matched: nameMatch.match || usernameMatch.match || upiMatch.match
+          }
+        })
+        .filter(r => r.matched)
+        .sort((a, b) => b.score - a.score)
+        .map(r => r.contact)
+      
+      setSearchResults(scoredResults)
       return
     }
 
     try {
       const data = await userAPI.search(query)
-      setSearchResults(data.users || [])
+      if (data.users && data.users.length > 0) {
+        setSearchResults(data.users)
+      } else {
+        // Fall back to local fuzzy search if API returns no results
+        const scoredResults = contacts
+          .map(c => {
+            const nameMatch = fuzzyMatch(c.full_name, query)
+            const usernameMatch = fuzzyMatch(c.username, query)
+            const bestScore = Math.max(nameMatch.score, usernameMatch.score)
+            return { contact: c, score: bestScore, matched: nameMatch.match || usernameMatch.match }
+          })
+          .filter(r => r.matched)
+          .sort((a, b) => b.score - a.score)
+          .map(r => r.contact)
+        setSearchResults(scoredResults)
+      }
     } catch (err) {
       console.error('Search failed:', err)
-      // Fall back to demo contacts filtering
-      const filtered = contacts.filter(c => 
-        c.full_name.toLowerCase().includes(query.toLowerCase())
-      )
-      setSearchResults(filtered)
+      // Fall back to demo contacts filtering with fuzzy matching
+      const scoredResults = contacts
+        .map(c => {
+          const nameMatch = fuzzyMatch(c.full_name, query)
+          return { contact: c, score: nameMatch.score, matched: nameMatch.match }
+        })
+        .filter(r => r.matched)
+        .sort((a, b) => b.score - a.score)
+        .map(r => r.contact)
+      setSearchResults(scoredResults)
     }
   }
 

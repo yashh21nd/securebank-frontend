@@ -25,6 +25,8 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
   const [contacts, setContacts] = useState([])
   const [showAmountInput, setShowAmountInput] = useState(false)
   const [quickPayAmount, setQuickPayAmount] = useState('')
+  const [quickPayFraudAnalysis, setQuickPayFraudAnalysis] = useState(null)
+  const [isAnalyzingQuickPay, setIsAnalyzingQuickPay] = useState(false)
   
   const recognitionRef = useRef(null)
 
@@ -95,6 +97,34 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
     setBalance(currentBalance)
   }, [currentBalance])
 
+  // Analyze fraud when quick pay amount changes
+  useEffect(() => {
+    if (selectedContact && quickPayAmount && parseFloat(quickPayAmount) > 0) {
+      const timer = setTimeout(async () => {
+        setIsAnalyzingQuickPay(true)
+        try {
+          const result = await analyzeTransaction({
+            senderId: user?.id || 'C' + Date.now(),
+            recipientId: selectedContact.id,
+            amount: parseFloat(quickPayAmount),
+            senderBalance: balance,
+            recipientBalance: 0,
+            type: 'transfer'
+          })
+          setQuickPayFraudAnalysis(result)
+        } catch (err) {
+          console.error('Quick pay fraud analysis failed:', err)
+          setQuickPayFraudAnalysis(null)
+        } finally {
+          setIsAnalyzingQuickPay(false)
+        }
+      }, 400)
+      return () => clearTimeout(timer)
+    } else {
+      setQuickPayFraudAnalysis(null)
+    }
+  }, [quickPayAmount, selectedContact, balance, user])
+
   useEffect(() => {
     // Initialize Web Speech API if available
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -164,46 +194,124 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
     setIsListening(false)
   }
 
+  // Fuzzy search helper function for better name matching
+  const fuzzyMatch = (text, query) => {
+    const textLower = text.toLowerCase()
+    const queryLower = query.toLowerCase()
+    
+    // Direct match
+    if (textLower.includes(queryLower)) return { match: true, score: 100 }
+    
+    // Split query into words and check if all words match
+    const queryWords = queryLower.split(/\s+/)
+    const textWords = textLower.split(/\s+/)
+    
+    let matchedWords = 0
+    for (const qWord of queryWords) {
+      for (const tWord of textWords) {
+        if (tWord.startsWith(qWord) || tWord.includes(qWord)) {
+          matchedWords++
+          break
+        }
+      }
+    }
+    
+    if (matchedWords === queryWords.length) return { match: true, score: 80 }
+    
+    // Partial first letter match
+    const queryInitials = queryWords.map(w => w[0]).join('')
+    const textInitials = textWords.map(w => w[0]).join('')
+    if (textInitials.includes(queryInitials)) return { match: true, score: 60 }
+    
+    // Similarity for typo tolerance
+    let matches = 0
+    for (let i = 0; i < queryLower.length; i++) {
+      if (textLower.includes(queryLower[i])) matches++
+    }
+    const similarity = matches / queryLower.length
+    if (similarity > 0.6) return { match: true, score: Math.floor(similarity * 50) }
+    
+    return { match: false, score: 0 }
+  }
+
+  // Find best matching contact with fuzzy search
+  const findBestMatchingContact = (recipientName) => {
+    if (!recipientName || !contacts.length) return null
+    
+    const scoredContacts = contacts.map(c => {
+      const nameMatch = fuzzyMatch(c.full_name, recipientName)
+      const usernameMatch = fuzzyMatch(c.username, recipientName)
+      const bestScore = Math.max(nameMatch.score, usernameMatch.score)
+      return { contact: c, score: bestScore, matched: nameMatch.match || usernameMatch.match }
+    })
+    
+    const bestMatch = scoredContacts
+      .filter(r => r.matched)
+      .sort((a, b) => b.score - a.score)[0]
+    
+    return bestMatch ? bestMatch.contact : null
+  }
+
   const parseCommandLocally = (text) => {
     const lowerText = text.toLowerCase()
     
-    // Payment patterns
+    // Payment patterns - improved to handle more variations
     const paymentPatterns = [
-      /(?:pay|send|transfer)\s+(?:rs\.?|₹|rupees?)?\s*(\d+(?:\.\d{2})?)\s+(?:to|for)\s+(\w+)/i,
-      /(?:pay|send|transfer)\s+(\w+)\s+(?:rs\.?|₹|rupees?)?\s*(\d+(?:\.\d{2})?)/i,
-      /(\d+(?:\.\d{2})?)\s+(?:to|for)\s+(\w+)/i,
+      /(?:pay|send|transfer)\s+(?:rs\.?|₹|rupees?)?\s*(\d+(?:\.\d{2})?)\s+(?:to|for)\s+(.+?)(?:\s*$)/i,
+      /(?:pay|send|transfer)\s+(.+?)\s+(?:rs\.?|₹|rupees?)?\s*(\d+(?:\.\d{2})?)/i,
+      /(\d+(?:\.\d{2})?)\s+(?:to|for)\s+(.+?)(?:\s*$)/i,
+      /(?:pay|send)\s+(.+)/i, // Just "pay priya" - will need amount input
     ]
     
-    for (const pattern of paymentPatterns) {
+    for (let i = 0; i < paymentPatterns.length; i++) {
+      const pattern = paymentPatterns[i]
       const match = text.match(pattern)
       if (match) {
         let amount, recipient
-        if (pattern === paymentPatterns[1]) {
-          recipient = match[1]
-          amount = parseFloat(match[2])
-        } else {
+        
+        if (i === 0) {
           amount = parseFloat(match[1])
-          recipient = match[2]
+          recipient = match[2].trim()
+        } else if (i === 1) {
+          recipient = match[1].trim()
+          amount = parseFloat(match[2])
+        } else if (i === 2) {
+          amount = parseFloat(match[1])
+          recipient = match[2].trim()
+        } else if (i === 3) {
+          // Just recipient, no amount
+          recipient = match[1].trim()
+          amount = null
         }
         
-        // Find matching contact from dataset-enriched contacts
-        const matchedContact = contacts.find(c => 
-          c.username.toLowerCase() === recipient.toLowerCase() ||
-          c.full_name.toLowerCase().includes(recipient.toLowerCase())
-        )
+        // Find matching contact using fuzzy search
+        const matchedContact = findBestMatchingContact(recipient)
         
         if (matchedContact) {
           setSelectedContact(matchedContact)
           setContactFraudProfile(matchedContact.fraudProfile || null)
         }
         
-        return {
-          action: 'payment',
-          amount,
-          recipient: matchedContact ? matchedContact.full_name : recipient,
-          recipientId: matchedContact ? matchedContact.id : 'unknown-' + recipient.toLowerCase(),
-          matchedContact: matchedContact || null,
-          raw_text: text
+        // If no amount was specified, we'll need to ask for it
+        if (amount === null && matchedContact) {
+          return {
+            action: 'payment_no_amount',
+            recipient: matchedContact.full_name,
+            recipientId: matchedContact.id,
+            matchedContact: matchedContact,
+            raw_text: text
+          }
+        }
+        
+        if (amount && (matchedContact || recipient)) {
+          return {
+            action: 'payment',
+            amount,
+            recipient: matchedContact ? matchedContact.full_name : recipient,
+            recipientId: matchedContact ? matchedContact.id : 'unknown-' + recipient.toLowerCase(),
+            matchedContact: matchedContact || null,
+            raw_text: text
+          }
         }
       }
     }
@@ -250,6 +358,13 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           },
           message: `Send ₹${localParsed.amount} to ${localParsed.recipient}?`
         })
+      } else if (localParsed.action === 'payment_no_amount') {
+        // Show amount input for recipient found without amount
+        setSelectedContact(localParsed.matchedContact)
+        setContactFraudProfile(localParsed.matchedContact?.fraudProfile || null)
+        setShowAmountInput(true)
+        setSuccess(`Found ${localParsed.recipient}. Please enter the amount to pay.`)
+        speakResponse(`Found ${localParsed.recipient}. Please enter the amount.`)
       } else if (localParsed.action === 'balance_check') {
         setSuccess(`Your current balance is ₹${balance.toFixed(2)}`)
         speakResponse(`Your current balance is ${balance} rupees`)
@@ -808,7 +923,7 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
             <div className="quick-pay-input-section">
               <div className="quick-pay-header">
                 <h4>Send Money to {selectedContact.full_name}</h4>
-                <button className="close-quick-pay" onClick={() => { setShowAmountInput(false); setSelectedContact(null); setContactFraudProfile(null); setQuickPayAmount(''); }}>×</button>
+                <button className="close-quick-pay" onClick={() => { setShowAmountInput(false); setSelectedContact(null); setContactFraudProfile(null); setQuickPayAmount(''); setQuickPayFraudAnalysis(null); }}>×</button>
               </div>
               <div className="quick-pay-form">
                 <div className="amount-input-wrapper">
@@ -824,11 +939,13 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
                 </div>
                 <button
                   className="btn-quick-pay"
-                  disabled={!quickPayAmount || parseFloat(quickPayAmount) <= 0 || loading}
+                  disabled={!quickPayAmount || parseFloat(quickPayAmount) <= 0 || loading || (quickPayFraudAnalysis?.shouldBlock)}
                   onClick={() => {
                     const amount = parseFloat(quickPayAmount)
                     if (amount > 0) {
                       setShowAmountInput(false)
+                      // Pass fraud analysis to confirmation
+                      setFraudAnalysis(quickPayFraudAnalysis)
                       setConfirmation({
                         confirmation_required: true,
                         payment_details: {
@@ -838,13 +955,59 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
                         },
                         message: `Send ₹${amount} to ${selectedContact.full_name}?`
                       })
+                      // Show warning if high risk
+                      if (quickPayFraudAnalysis?.requiresReview) {
+                        setShowFraudWarning(true)
+                      }
                     }
                   }}
                 >
-                  Continue
+                  {quickPayFraudAnalysis?.shouldBlock ? 'Blocked' : 'Continue'}
                 </button>
               </div>
-              {selectedContact.fraudProfile && (
+              
+              {/* ML Fraud Analysis Preview for Quick Pay */}
+              {quickPayAmount && parseFloat(quickPayAmount) > 0 && (
+                <div className={`quick-pay-fraud-preview ${quickPayFraudAnalysis?.riskLevel || 'analyzing'}`}>
+                  <div className="fraud-preview-header">
+                    <svg className="fraud-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span>ML Fraud Analysis</span>
+                    {isAnalyzingQuickPay && <span className="analyzing-dot"></span>}
+                  </div>
+                  {quickPayFraudAnalysis && !isAnalyzingQuickPay && (
+                    <div className="fraud-preview-content">
+                      <div className={`risk-badge-inline ${quickPayFraudAnalysis.riskLevel}`}>
+                        <span className="risk-level">{quickPayFraudAnalysis.riskLevel.toUpperCase()}</span>
+                        <span className="fraud-prob">{(quickPayFraudAnalysis.fraudProbability * 100).toFixed(1)}%</span>
+                      </div>
+                      {quickPayFraudAnalysis.isFraud && (
+                        <div className="fraud-alert-inline">
+                          ⚠️ Potential fraud detected
+                        </div>
+                      )}
+                      {quickPayFraudAnalysis.shouldBlock && (
+                        <div className="fraud-blocked-msg">
+                          🚫 This transaction has been blocked for your safety
+                        </div>
+                      )}
+                      {quickPayFraudAnalysis.riskFactors && quickPayFraudAnalysis.riskFactors.length > 0 && (
+                        <div className="risk-factors-compact">
+                          {quickPayFraudAnalysis.riskFactors.slice(0, 2).map((f, i) => (
+                            <span key={i} className="risk-factor-tag">{f}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {isAnalyzingQuickPay && (
+                    <div className="analyzing-msg">Analyzing transaction...</div>
+                  )}
+                </div>
+              )}
+              
+              {selectedContact.fraudProfile && !quickPayFraudAnalysis && (
                 <div className={`quick-pay-risk-indicator ${selectedContact.fraudProfile.riskLevel}`}>
                   <span className="risk-icon">
                     {selectedContact.fraudProfile.riskLevel === 'low' && '✓'}
@@ -852,7 +1015,7 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
                     {selectedContact.fraudProfile.riskLevel === 'high' && '⚠'}
                     {selectedContact.fraudProfile.riskLevel === 'critical' && '🚨'}
                   </span>
-                  <span>Risk Level: {selectedContact.fraudProfile.riskLevel.toUpperCase()}</span>
+                  <span>Recipient Risk: {selectedContact.fraudProfile.riskLevel.toUpperCase()}</span>
                 </div>
               )}
             </div>
@@ -2193,6 +2356,137 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
           100% { opacity: 0; transform: rotate(var(--angle)) translateX(120px) scale(0); }
         }
 
+        /* Quick Pay Fraud Preview Styles */
+        .quick-pay-fraud-preview {
+          margin-top: 12px;
+          padding: 12px;
+          border-radius: 10px;
+          background: #f0fdf4;
+          border: 1px solid #86efac;
+        }
+
+        .quick-pay-fraud-preview.analyzing {
+          background: #f9fafb;
+          border-color: #e5e7eb;
+        }
+
+        .quick-pay-fraud-preview.high,
+        .quick-pay-fraud-preview.critical {
+          background: #fef2f2;
+          border-color: #fca5a5;
+        }
+
+        .quick-pay-fraud-preview.medium {
+          background: #fffbeb;
+          border-color: #fcd34d;
+        }
+
+        .quick-pay-fraud-preview .fraud-preview-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 8px;
+        }
+
+        .quick-pay-fraud-preview .fraud-icon {
+          width: 14px;
+          height: 14px;
+        }
+
+        .quick-pay-fraud-preview .analyzing-dot {
+          width: 8px;
+          height: 8px;
+          background: #3b82f6;
+          border-radius: 50%;
+          animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .quick-pay-fraud-preview .fraud-preview-content {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .quick-pay-fraud-preview .risk-badge-inline {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .risk-badge-inline.low {
+          background: #d1fae5;
+          color: #065f46;
+        }
+
+        .risk-badge-inline.medium {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .risk-badge-inline.high {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        .risk-badge-inline.critical {
+          background: #7c2d12;
+          color: white;
+        }
+
+        .quick-pay-fraud-preview .fraud-prob {
+          font-weight: 400;
+          opacity: 0.8;
+        }
+
+        .quick-pay-fraud-preview .fraud-alert-inline {
+          font-size: 12px;
+          color: #dc2626;
+          padding: 4px 8px;
+          background: #fef2f2;
+          border-radius: 4px;
+        }
+
+        .quick-pay-fraud-preview .fraud-blocked-msg {
+          font-size: 12px;
+          color: #991b1b;
+          padding: 8px 12px;
+          background: #fee2e2;
+          border-radius: 6px;
+          font-weight: 500;
+        }
+
+        .quick-pay-fraud-preview .risk-factors-compact {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .quick-pay-fraud-preview .risk-factor-tag {
+          font-size: 10px;
+          padding: 2px 6px;
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 4px;
+          color: #6b7280;
+        }
+
+        .quick-pay-fraud-preview .analyzing-msg {
+          font-size: 12px;
+          color: #6b7280;
+          font-style: italic;
+        }
+
         @media (max-width: 600px) {
           .voice-container {
             margin: 0 16px;
@@ -2204,6 +2498,14 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
 
           .contact-chips {
             justify-content: center;
+          }
+
+          .quick-pay-fraud-preview {
+            padding: 10px;
+          }
+
+          .quick-pay-fraud-preview .fraud-preview-header {
+            font-size: 11px;
           }
         }
       `}</style>

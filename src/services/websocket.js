@@ -10,28 +10,52 @@ class WebSocketService {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 3000;
+    this.pendingResponses = new Map();
+    this.connectionPromise = null;
+    this.isConnecting = false;
   }
 
   connect(userId) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    // Return existing promise if connection is in progress
+    if (this.isConnecting && this.connectionPromise) {
+      return this.connectionPromise;
+    }
+
+    // Return resolved promise if already connected
+    if (this.socket && (this.socket.connected || this.socket.readyState === WebSocket.OPEN)) {
       console.log('WebSocket already connected');
-      return;
+      return Promise.resolve(this.socket);
     }
 
     this.userId = userId;
+    this.isConnecting = true;
 
-    // Connect to Socket.IO
-    // For Socket.IO, we'll use the socket.io-client library
-    // For now, we'll simulate with native WebSocket for demo
-    try {
-      // Using Socket.IO client
-      if (typeof io !== 'undefined') {
-        this.socket = io('http://localhost:5000', {
-          transports: ['websocket', 'polling'],
-        });
+    // Create connection promise to avoid race conditions
+    this.connectionPromise = new Promise((resolve, reject) => {
+      const connectionTimeout = setTimeout(() => {
+        this.isConnecting = false;
+        console.log('WebSocket connection timeout, using simulation mode');
+        this.simulateConnection();
+        resolve(null);
+      }, 5000);
+
+      // Connect to Socket.IO
+      // For Socket.IO, we'll use the socket.io-client library
+      try {
+        // Using Socket.IO client
+        if (typeof io !== 'undefined') {
+          this.socket = io('http://localhost:5000', {
+            transports: ['websocket', 'polling'],
+            timeout: 5000,
+            reconnection: true,
+            reconnectionAttempts: this.maxReconnectAttempts,
+            reconnectionDelay: this.reconnectDelay,
+          });
 
         this.socket.on('connect', () => {
           console.log('WebSocket connected');
+          clearTimeout(connectionTimeout);
+          this.isConnecting = false;
           this.reconnectAttempts = 0;
           
           // Register user for notifications
@@ -39,11 +63,24 @@ class WebSocketService {
           
           // Emit connected event to listeners
           this.emit('connected', { userId });
+          resolve(this.socket);
         });
 
-        this.socket.on('disconnect', () => {
-          console.log('WebSocket disconnected');
-          this.emit('disconnected', {});
+        this.socket.on('connect_error', (error) => {
+          console.log('WebSocket connect error:', error.message);
+          clearTimeout(connectionTimeout);
+          this.isConnecting = false;
+          this.simulateConnection();
+          resolve(null);
+        });
+
+        this.socket.on('disconnect', (reason) => {
+          console.log('WebSocket disconnected:', reason);
+          this.emit('disconnected', { reason });
+          // Clear any pending responses to avoid channel closure errors
+          this.pendingResponses.forEach((_, key) => {
+            this.pendingResponses.delete(key);
+          });
         });
 
         // Listen for notifications
@@ -87,14 +124,23 @@ class WebSocketService {
           this.emit('transaction_update', data);
         });
 
-      } else {
-        console.log('Socket.IO not available, using simulation mode');
+        } else {
+          clearTimeout(connectionTimeout);
+          this.isConnecting = false;
+          console.log('Socket.IO not available, using simulation mode');
+          this.simulateConnection();
+          resolve(null);
+        }
+      } catch (error) {
+        clearTimeout(connectionTimeout);
+        this.isConnecting = false;
+        console.error('WebSocket connection error:', error);
         this.simulateConnection();
+        resolve(null);
       }
-    } catch (error) {
-      console.error('WebSocket connection error:', error);
-      this.simulateConnection();
-    }
+    });
+
+    return this.connectionPromise;
   }
 
   simulateConnection() {
