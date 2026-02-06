@@ -3,7 +3,9 @@
  * Connects to the ML-powered fraud detection API
  */
 
-const FRAUD_API_URL = import.meta.env.VITE_FRAUD_API_URL || 'http://localhost:5001/api';
+// Use the same API base as the main backend, with /fraud suffix
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const FRAUD_API_URL = import.meta.env.VITE_FRAUD_API_URL || `${API_BASE_URL}/fraud`;
 
 /**
  * Analyze a transaction for potential fraud
