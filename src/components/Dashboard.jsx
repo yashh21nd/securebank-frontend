@@ -212,26 +212,34 @@ export default function Dashboard({ newTransaction, onTransactionProcessed }){
   const [transactions, setTransactions] = useState(initialTransactions)
   const [weekFilter, setWeekFilter] = useState('all') // 'all', 'thisWeek', 'lastWeek'
   const [recentPayment, setRecentPayment] = useState(null)
+  const processedTxRef = React.useRef(new Set())
 
   // Handle new transaction from Voice/Payment components
   useEffect(() => {
     if (newTransaction && newTransaction.id) {
-      // Check if transaction already exists
-      const exists = transactions.some(tx => tx.id === newTransaction.id)
-      if (!exists) {
-        setTransactions(prev => [newTransaction, ...prev])
-        setRecentPayment(newTransaction)
-        
-        // Clear recent payment highlight after 5 seconds
-        setTimeout(() => setRecentPayment(null), 5000)
-        
-        // Notify parent that transaction was processed
-        if (onTransactionProcessed) {
-          onTransactionProcessed(newTransaction.id)
-        }
+      // Use ref to track processed transactions to handle React StrictMode double-invoke
+      if (processedTxRef.current.has(newTransaction.id)) {
+        return
+      }
+      processedTxRef.current.add(newTransaction.id)
+      
+      // Check if transaction already exists in state
+      setTransactions(prev => {
+        const exists = prev.some(tx => tx.id === newTransaction.id)
+        if (exists) return prev
+        return [newTransaction, ...prev]
+      })
+      setRecentPayment(newTransaction)
+      
+      // Clear recent payment highlight after 5 seconds
+      setTimeout(() => setRecentPayment(null), 5000)
+      
+      // Notify parent that transaction was processed
+      if (onTransactionProcessed) {
+        onTransactionProcessed(newTransaction.id)
       }
     }
-  }, [newTransaction])
+  }, [newTransaction, onTransactionProcessed])
 
   const addTransaction = (newTx) => {
     setTransactions([newTx, ...transactions])

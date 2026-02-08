@@ -45,48 +45,12 @@ export default function VoicePayment({ user, onPaymentComplete, isLoggedIn, curr
   // Load fraud profiles from PaySim dataset on mount
   useEffect(() => {
     const loadFraudProfiles = async () => {
+      // Check fraud service silently - client-side analysis is primary
       const isHealthy = await checkFraudServiceHealth()
       setFraudServiceActive(isHealthy)
       
-      if (isHealthy) {
-        // Get dataset statistics
-        const stats = await getDatasetStats()
-        if (stats.status === 'success') {
-          setDatasetStats(stats.statistics)
-        }
-        
-        // Load fraud profile for each contact
-        const contactsWithProfiles = await Promise.all(
-          baseContacts.map(async (contact) => {
-            const profile = await getContactFraudProfile(contact.id, contact.riskBias)
-            if (profile) {
-              return {
-                ...contact,
-                fraudProfile: {
-                  riskScore: profile.risk_score,
-                  riskLevel: profile.risk_level,
-                  isFlagged: profile.is_flagged,
-                  historicalTransactions: profile.historical_transactions,
-                  flaggedTransactions: profile.flagged_transactions,
-                  avgTransactionAmount: profile.avg_transaction_amount,
-                  maxTransactionAmount: profile.max_transaction_amount,
-                  commonTransactionTypes: profile.common_transaction_types,
-                  accountAge: profile.account_age,
-                  riskFactors: profile.risk_factors,
-                  recommendation: profile.recommendation,
-                  dataSource: profile.data_source,
-                  modelConfidence: profile.model_confidence,
-                  lastActivity: profile.last_activity
-                }
-              }
-            }
-            return contact
-          })
-        )
-        setContacts(contactsWithProfiles)
-      } else {
-        setContacts(baseContacts)
-      }
+      // Always use base contacts with client-side fraud analysis
+      setContacts(baseContacts)
     }
     
     loadFraudProfiles()

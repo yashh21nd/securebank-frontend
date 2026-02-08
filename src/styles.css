@@ -1854,3 +1854,948 @@ input::placeholder {
     padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
 }
+
+/* ============================================
+   Dataset-based Fraud Detection Styles
+   ============================================ */
+
+/* Dataset Stats Badge */
+.dataset-stats-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.dataset-stats-badge .badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.dataset-stats-badge .badge-divider {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.dataset-stats-badge .badge-detail {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Contacts Grid Expanded */
+.contacts-grid.expanded {
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+  gap: 10px;
+}
+
+/* Contact Fraud Tag */
+.contact-fraud-tag {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 8px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.contact-fraud-tag.fraud {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.contact-fraud-tag.legit {
+  background: rgba(16, 185, 129, 0.9);
+  color: white;
+}
+
+.contact-item {
+  position: relative;
+}
+
+/* Show All Button */
+.btn-show-all {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--surface), rgba(16, 185, 129, 0.05));
+  border: 1px dashed rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-show-all:hover {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: var(--primary);
+}
+
+/* Search Result Risk Badge */
+.user-risk-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.user-risk-badge.low {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--secondary);
+}
+
+.user-risk-badge.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.user-risk-badge.high {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.user-risk-badge.critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+/* Dataset Indicator in Search */
+.dataset-indicator {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.fraud-tag {
+  font-size: 9px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.fraud-tag.fraud {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.fraud-tag.legit {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+/* Risk Indicator Small */
+.risk-indicator-small {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444;
+  color: white;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.risk-indicator-small.high,
+.risk-indicator-small.critical {
+  background: #ef4444;
+}
+
+.user-avatar {
+  position: relative;
+}
+
+/* Dataset Info Section */
+.dataset-info-section {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+  border-radius: 10px;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.dataset-info-section h5 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.dataset-info-section h5 svg {
+  stroke: #3b82f6;
+}
+
+.dataset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dataset-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dataset-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dataset-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dataset-value.type-cash_out,
+.dataset-value.type-transfer {
+  color: #3b82f6;
+}
+
+.dataset-value.fraud-label {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.dataset-value.fraud-label.is-fraud {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dataset-value.fraud-label.is-legit {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Profile Footer */
+.profile-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.data-source {
+  padding: 3px 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+/* Dataset Source Info in Fraud Preview */
+.dataset-source-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 11px;
+}
+
+.dataset-source-info .source-label {
+  color: var(--text-muted);
+}
+
+.dataset-source-info .source-type {
+  padding: 2px 6px;
+  background: rgba(59, 130, 246, 0.15);
+  border-radius: 4px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.dataset-source-info .source-amount {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.dataset-source-info .source-verdict {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.dataset-source-info .source-verdict.fraud {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.dataset-source-info .source-verdict.legit {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+/* Mobile Responsive for Dataset Elements */
+@media (max-width: 600px) {
+  .dataset-stats-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .contacts-grid.expanded {
+    grid-template-columns: repeat(4, 1fr);
+    max-height: 300px;
+  }
+
+  .dataset-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dataset-source-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .profile-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+/* ============================================
+   QR PAYMENT MODAL STYLES
+   ============================================ */
+
+.qr-reader-container {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.qr-reader-container video {
+  border-radius: 12px;
+}
+
+.scan-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.scan-error {
+  margin-top: 1rem;
+}
+
+/* QR Payment Modal Overlay */
+.qr-payment-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.qr-payment-modal {
+  background: var(--surface);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qr-modal-header {
+  text-align: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.qr-scan-success-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  animation: pulse 2s ease infinite;
+}
+
+.qr-scan-success-icon svg {
+  color: white;
+}
+
+.qr-modal-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.blockchain-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+  color: var(--primary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.qr-modal-body {
+  padding: 1.5rem;
+}
+
+/* QR Recipient Card */
+.qr-recipient-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--background);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.qr-recipient-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.qr-recipient-avatar.low {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.qr-recipient-avatar.medium {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.qr-recipient-avatar.high {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.qr-recipient-avatar.critical {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.qr-recipient-details {
+  flex: 1;
+}
+
+.qr-recipient-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.qr-recipient-upi {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.qr-recipient-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
+}
+
+.qr-recipient-tag.fraud {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.qr-recipient-tag.legit {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+/* QR Fraud Analysis */
+.qr-fraud-analysis {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid;
+}
+
+.qr-fraud-analysis.low {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.qr-fraud-analysis.medium {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.qr-fraud-analysis.high {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.05);
+}
+
+.qr-fraud-analysis.critical {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.fraud-analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.fraud-probability-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.prob-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 100px;
+}
+
+.prob-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.prob-fill.low {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.prob-fill.medium {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.prob-fill.high {
+  background: linear-gradient(90deg, #f97316, #ea580c);
+}
+
+.prob-fill.critical {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.prob-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  width: 50px;
+  text-align: right;
+}
+
+.qr-risk-factors {
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.qr-risk-factors strong {
+  color: var(--text);
+}
+
+.qr-risk-factors ul {
+  margin: 0.3rem 0 0 1rem;
+  padding: 0;
+  color: var(--text-muted);
+}
+
+.qr-risk-factors li {
+  margin: 0.2rem 0;
+}
+
+.qr-recommendation {
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.qr-recommendation.low {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.qr-recommendation.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.qr-recommendation.high {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+.qr-recommendation.critical {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* QR Amount Section */
+.qr-amount-section {
+  margin-bottom: 1rem;
+}
+
+.qr-amount-section label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.qr-amount-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--background);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.qr-amount-input-wrapper:focus-within {
+  border-color: var(--primary);
+}
+
+.qr-amount-input-wrapper .currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 0.5rem;
+}
+
+.qr-amount-input {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+}
+
+.qr-quick-amounts {
+  margin-top: 0.75rem;
+  justify-content: center;
+}
+
+/* Blockchain Hash Section */
+.blockchain-hash-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.hash-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.hash-value {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background: none;
+}
+
+/* QR Modal Actions */
+.qr-modal-actions {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.qr-modal-actions .btn-primary {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.qr-modal-actions .btn-primary.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.qr-modal-actions .btn-secondary {
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+/* ============================================
+   QR PAYMENT SUCCESS POPUP STYLES
+   ============================================ */
+
+.qr-success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.qr-success-modal {
+  background: var(--surface);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.success-animation {
+  margin-bottom: 1.5rem;
+}
+
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: successPop 0.5s ease 0.2s both;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-checkmark svg {
+  color: white;
+  animation: checkDraw 0.4s ease 0.5s both;
+}
+
+@keyframes checkDraw {
+  from {
+    opacity: 0;
+    stroke-dashoffset: 50;
+  }
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+  margin: 0 0 0.5rem;
+}
+
+.success-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.success-recipient {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.success-recipient strong {
+  font-weight: 600;
+}
+
+.success-upi {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 1.5rem;
+}
+
+.success-details {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.detail-value {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.detail-value.hash {
+  font-family: monospace;
+  color: var(--primary);
+}
+
+.detail-value.risk-tag {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.detail-value.risk-tag.low {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.detail-value.risk-tag.medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.detail-value.risk-tag.high {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+}
+
+.detail-value.risk-tag.critical {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.risky-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.btn-done {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
